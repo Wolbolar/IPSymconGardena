@@ -1,0 +1,18 @@
+{
+    "id": "{9775D7CA-5667-8554-0172-2EBB2F553A54}",
+    "name": "Gardena Cloud",
+    "type": 2,
+    "vendor": "Gardena",
+    "aliases": [
+        "Gardena Cloud"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [
+        "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}"
+    ],
+    "implemented": [
+        "{0FE98840-1BBA-4E87-897D-30506FEF540A}"
+    ],
+    "prefix": "GARDENA",
+    "url": "https://github.com/Wolbolar/IPSymconGardena"
+}

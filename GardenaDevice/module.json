@@ -1,0 +1,18 @@
+{
+    "id": "{3B073BE1-6556-037C-42FB-6311BC452C68}",
+    "name": "Gardena Device",
+    "type": 3,
+    "vendor": "Gardena",
+    "aliases": [
+        "Gardena Device"
+    ],
+    "parentRequirements": [
+        "{0FE98840-1BBA-4E87-897D-30506FEF540A}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}"
+    ],
+    "prefix": "GARDENA",
+    "url": "https://github.com/Wolbolar/IPSymconGardena"
+}

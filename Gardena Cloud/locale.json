@@ -1,0 +1,10 @@
+{
+  "translations": {
+    "de": {
+      "Register": "Registrieren",
+      "Gardena: Please register with your Gardena account!": "Bitte mit dem Gardena Acoount registrieren!",
+      "Status: Symcon Connect is OK!": "Status: Symcon Connect ist OK!",
+      "Error: Symcon Connect is not active!": "Error: Symcon Connect is nicht aktiv!"
+    }
+  }
+}

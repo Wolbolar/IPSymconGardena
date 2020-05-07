@@ -1,0 +1,10 @@
+{
+	"elements": [
+		{ "type": "Button", "label": "Register", "onClick": "echo GARDENA_Register($id);" }
+	],
+	"actions":
+	[
+		{ "type": "Label" },
+		{ "type": "Label" }
+	]
+}
