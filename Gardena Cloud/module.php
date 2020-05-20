@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 class GardenaCloud extends IPSModule
 {
     //This one needs to be available on our OAuth client backend.
@@ -7,8 +8,9 @@ class GardenaCloud extends IPSModule
     private $oauthIdentifer = 'husqvarna';
 
     // GARDENA smart system API
-    private const SMART_SYSTEM_BASE_URL         = 'https://api.smart.gardena.dev/v1';
+    private const SMART_SYSTEM_BASE_URL = 'https://api.smart.gardena.dev/v1';
     private const LOCATIONS = '/locations';
+    private const APIKEY = 'b42b22bf-5482-4f0b-b78a-9c5558ff5b4a';
 
     public function Create()
     {
@@ -16,6 +18,7 @@ class GardenaCloud extends IPSModule
         parent::Create();
 
         $this->RegisterAttributeString('Token', '');
+        $this->RegisterAttributeString('location_id', '');
     }
 
     public function ApplyChanges()
@@ -43,14 +46,14 @@ class GardenaCloud extends IPSModule
         $ids = IPS_GetInstanceListByModuleID('{F99BF07D-CECA-438B-A497-E4B55F139D37}');
         if (count($ids) > 0) {
             $clientIDs = json_decode(IPS_GetProperty($ids[0], 'ClientIDs'), true);
-            $found     = false;
+            $found = false;
             foreach ($clientIDs as $index => $clientID) {
                 if ($clientID['ClientID'] == $WebOAuth) {
                     if ($clientID['TargetID'] == $this->InstanceID) {
                         return;
                     }
                     $clientIDs[$index]['TargetID'] = $this->InstanceID;
-                    $found                         = true;
+                    $found = true;
                 }
             }
             if (!$found) {
@@ -81,11 +84,11 @@ class GardenaCloud extends IPSModule
         $this->SendDebug('FetchRefreshToken', 'Use Authentication Code to get our precious Refresh Token!', 0);
         $options = [
             'http' => [
-                'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
+                'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
                 'content' => http_build_query(['code' => $code])]];
         $context = stream_context_create($options);
-        $result  = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+        $result = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
 
         $data = json_decode($result);
         $this->SendDebug('Symcon Connect Data', $result, 0);
@@ -157,11 +160,11 @@ class GardenaCloud extends IPSModule
 
             $options = [
                 'http' => [
-                    'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
-                    'method'  => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'POST',
                     'content' => http_build_query(['refresh_token' => $this->ReadAttributeString('Token')])]];
             $context = stream_context_create($options);
-            $result  = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+            $result = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
 
             $data = json_decode($result);
             $this->SendDebug('Symcon Connect Data', $result, 0);
@@ -170,7 +173,7 @@ class GardenaCloud extends IPSModule
             }
 
             //Update parameters to properly cache it in the next step
-            $Token   = $data->access_token;
+            $Token = $data->access_token;
             $Expires = time() + $data->expires_in;
 
             //Update Refresh Token if we received one! (This is optional)
@@ -190,13 +193,57 @@ class GardenaCloud extends IPSModule
         return $Token;
     }
 
+    private function FetchData($url)
+    {
+
+        $this->SendDebug("AT", $this->FetchAccessToken(), 0);
+
+        $opts = array(
+            "http" => array(
+                "method" => "GET",
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n",
+                "ignore_errors" => true
+            )
+        );
+        $context = stream_context_create($opts);
+
+        $result = file_get_contents($url, false, $context);
+
+        if ((strpos($http_response_header[0], '200') === false)) {
+            echo $http_response_header[0] . PHP_EOL . $result;
+            return false;
+        }
+
+        return $result;
+
+    }
+
+    /** Get Snapshot
+     * @return bool|false|string
+     */
+    public function RequestSnapshot()
+    {
+        $location_id = $this->ReadAttributeString('location_id');
+        $snapshot = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS . "/" . $location_id);
+        return $snapshot;
+    }
+
+    /** Get Locations
+     * @return bool|false|string
+     */
+    public function RequestLocations()
+    {
+        $locations = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
+        return $locations;
+    }
+
     private function GetData($url)
     {
-        $opts    = [
+        $opts = [
             'http' => [
                 'method' => 'GET',
                 'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/x-www-form-urlencoded'
-                            . "\r\n"]];
+                    . "\r\n"]];
         $context = stream_context_create($opts);
 
         return file_get_contents($url, false, $context);
@@ -204,11 +251,11 @@ class GardenaCloud extends IPSModule
 
     private function PostData($url, $content)
     {
-        $opts    = [
+        $opts = [
             'http' => [
-                'method'  => 'POST',
-                'header'  => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/json' . "\r\n"
-                             . 'Content-Length: ' . strlen($content) . "\r\n",
+                'method' => 'POST',
+                'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/json' . "\r\n"
+                    . 'Content-Length: ' . strlen($content) . "\r\n",
                 'content' => $content]];
         $context = stream_context_create($opts);
 
@@ -224,7 +271,7 @@ class GardenaCloud extends IPSModule
             return $this->PostData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
         } else {
             $this->SendDebug('ForwardData', $data->Endpoint, 0);
-            return $this->GetData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint);
+            return $this->FetchData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint);
         }
     }
 
