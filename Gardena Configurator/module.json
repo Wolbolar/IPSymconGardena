@@ -1,0 +1,16 @@
+{
+    "id": "{21DE95DE-7C2D-89AF-1401-4263C3BF9B1E}",
+    "name": "Gardena Configurator",
+    "type": 4,
+    "vendor": "Gardena",
+    "aliases": [
+        "Gardena Configurator"
+    ],
+    "parentRequirements": ["{3F1DBEA8-38D6-12F4-A487-AF43F6326060}"],
+    "childRequirements": [],
+    "implemented": [
+        "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}"
+    ],
+    "prefix": "GARDENA",
+    "url": "https://github.com/Wolbolar/IPSymconGardena"
+}
