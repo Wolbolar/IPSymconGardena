@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 class GardenaCloud extends IPSModule
 {
-    //This one needs to be available on our OAuth client backend.
-    //Please contact us to register for an identifier: https://www.symcon.de/kontakt/#OAuth
     private $oauthIdentifer = 'husqvarna';
 
     // GARDENA smart system API
@@ -17,8 +15,16 @@ class GardenaCloud extends IPSModule
         //Never delete this line!
         parent::Create();
 
+        $this->RegisterPropertyInteger("UpdateInterval", 60);
+        $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
         $this->RegisterAttributeString('location_id', '');
+        $this->RegisterAttributeString('location_name', '');
+        $this->RegisterAttributeString('snapshot', '[]');
+        $this->RegisterPropertyInteger("ImportCategoryID", 0);
+
+        //we will wait until the kernel is ready
+        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     public function ApplyChanges()
@@ -26,13 +32,64 @@ class GardenaCloud extends IPSModule
         //Never delete this line!
         parent::ApplyChanges();
 
+        if (IPS_GetKernelRunlevel() !== KR_READY) {
+            return;
+        }
+
         $this->RegisterOAuth($this->oauthIdentifer);
+        $gardena_interval = $this->ReadPropertyInteger('UpdateInterval');
+        $this->SetGardenaInterval($gardena_interval);
 
         if ($this->ReadAttributeString('Token') == '') {
             $this->SetStatus(IS_INACTIVE);
         } else {
             $this->SetStatus(IS_ACTIVE);
         }
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        switch ($Message) {
+            case IM_CHANGESTATUS:
+                if ($Data[0] === IS_ACTIVE) {
+                    $this->ApplyChanges();
+                }
+                break;
+
+            case IPS_KERNELMESSAGE:
+                if ($Data[0] === KR_READY) {
+                    $this->ApplyChanges();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public function Update()
+    {
+        $this->UpdateStatus();
+    }
+
+    public function UpdateStatus()
+    {
+        $snapshot = $this->RequestSnapshot();
+        $this->SendDebug('Send Snapshot', $snapshot, 0);
+        $this->SendDataToChildren(json_encode(Array("DataID" => "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}", "Buffer" => $snapshot)));
+    }
+
+    private function SetGardenaInterval($gardena_interval): void
+    {
+        $interval     = $gardena_interval * 1000;
+        $this->SetTimerInterval('Update', $interval);
+    }
+
+    public function CheckToken()
+    {
+        $token = $this->ReadAttributeString('Token');
+        return $token;
     }
 
     public function GetToken()
@@ -148,16 +205,6 @@ class GardenaCloud extends IPSModule
             }
 
             $this->SendDebug('FetchAccessToken', 'Use Refresh Token to get new Access Token!', 0);
-
-            //If we slipped here we need to fetch the access token
-            /*
-      * curl -X POST -d \
---url "https://api.authentication.husqvarnagroup.dev/v1/oauth2/token" \
---header "content-type: application/x-www-form-urlencoded" \
---data "grant_type=authorization_code&client_id=<APP KEY>&client_secret=<CLIENT_SECRET>&code=<AUTHORIZATION_CODE>&redirect_uri=<REDIRECT_URI>&state=<STATE>"
-      */
-
-
             $options = [
                 'http' => [
                     'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
@@ -210,7 +257,7 @@ class GardenaCloud extends IPSModule
         $result = file_get_contents($url, false, $context);
 
         if ((strpos($http_response_header[0], '200') === false)) {
-            echo $http_response_header[0] . PHP_EOL . $result;
+            $this->SendDebug('HTTP Response Header', $http_response_header[0] . PHP_EOL . $result, 0);
             return false;
         }
 
@@ -218,32 +265,63 @@ class GardenaCloud extends IPSModule
 
     }
 
-    /** Get Snapshot
+
+    // GARDENA smart system API
+
+    // Snapshot
+    //Fetch current state of devices. Rate limited, so frequent polling not possible.
+
+    /** Get location with its devices and services (a device can have multiple services).
      * @return bool|false|string
      */
     public function RequestSnapshot()
     {
         $location_id = $this->ReadAttributeString('location_id');
-        $snapshot = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS . "/" . $location_id);
+        if ($location_id != '') {
+            $snapshot = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS . "/" . $location_id);
+        } else {
+            $snapshot = '[]';
+        }
+        $this->WriteAttributeString('snapshot', $snapshot);
         return $snapshot;
     }
 
-    /** Get Locations
+    /** List Locations
      * @return bool|false|string
      */
     public function RequestLocations()
     {
-        $locations = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
-        return $locations;
+        $state_location = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
+        $this->SendDebug('Gardena Locations', $state_location, 0);
+        $location_data = json_decode($state_location, true);
+        $location_id = $location_data['data'][0]['id'];
+        $location_name = $location_data['data'][0]['attributes']['name'];
+        $this->SendDebug('Gardena Location Name', $location_name, 0);
+        $this->WriteAttributeString('location_name', $location_name);
+        $this->SendDebug('Gardena Location ID', $location_id, 0);
+        $this->WriteAttributeString('location_id', $location_id);
+        return $location_id;
     }
 
-    private function GetData($url)
+    public function GetConfiguration()
+    {
+        $location_id = $this->ReadAttributeString('location_id');
+        if ($location_id != '') {
+            $this->RequestSnapshot();
+        } else {
+            $this->RequestLocations();
+            $this->RequestSnapshot();
+        }
+    }
+
+    private function PutData($url, $content)
     {
         $opts = [
             'http' => [
-                'method' => 'GET',
-                'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/x-www-form-urlencoded'
-                    . "\r\n"]];
+                'method' => 'PUT',
+                'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/json' . "\r\n"
+                    . 'Content-Length: ' . strlen($content) . "\r\n",
+                'content' => $content]];
         $context = stream_context_create($opts);
 
         return file_get_contents($url, false, $context);
@@ -267,43 +345,250 @@ class GardenaCloud extends IPSModule
         $data = json_decode($data);
 
         if (strlen($data->Payload) > 0) {
-            $this->SendDebug('ForwardData', $data->Endpoint . ', Payload: ' . $data->Payload, 0);
-            return $this->PostData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
+            $type = $data->Type;
+            if($type == 'PUT')
+            {
+                $this->SendDebug('ForwardData', $data->Endpoint . ', Payload: ' . $data->Payload, 0);
+                return $this->PutData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
+            }
+            elseif($type == 'POST')
+            {
+                $this->SendDebug('ForwardData', $data->Endpoint . ', Payload: ' . $data->Payload, 0);
+                return $this->PostData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
+            }
         } else {
             $this->SendDebug('ForwardData', $data->Endpoint, 0);
-            return $this->FetchData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint);
+            if($data->Endpoint == 'location_id')
+            {
+                $response = $this->ReadAttributeString('location_id');
+            }
+            elseif($data->Endpoint == 'snapshot')
+            {
+                $response = $this->RequestSnapshot();
+            }
+            elseif($data->Endpoint == 'request_location_id')
+            {
+                $response = $this->RequestLocations();
+            }
+            elseif($data->Endpoint == 'token')
+            {
+                $response = $this->CheckToken();
+            }
+            return $response;
         }
     }
 
+    /** Get Device Type
+     * @param $device
+     * @return array
+     */
+    private function GetDeviceType($device)
+    {
+        $model_type = $device['attributes']['modelType']['value'];
+        if ($model_type == 'GARDENA smart Irrigation Control') {
+            $data = $this->GetIrrigationControlData($device);
+        } elseif ($model_type == 'GARDENA smart Sensor') {
+            $data = $this->GetSensorInfo($device);
+        }
+        return $data;
+    }
+
+    /** Get Sensor Info
+     * @param $device
+     * @return array
+     */
+    private function GetSensorInfo($device)
+    {
+        $id = $device['id'];
+        $name = $device['attributes']['name']['value'];
+        $battery_level = $device['attributes']['batteryLevel']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery level: ' . $battery_level . '%', 0);
+        $battery_level_timestamp = $device['attributes']['batteryLevel']['timestamp'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery level timestamp: ' . $battery_level_timestamp, 0);
+        $battery_state = $device['attributes']['batteryState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery state: ' . $battery_state, 0);
+        $battery_state_timestamp = $device['attributes']['batteryState']['timestamp'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery state timestamp: ' . $battery_state_timestamp, 0);
+        $rf_link_level = $device['attributes']['rfLinkLevel']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link level: ' . $rf_link_level . '%', 0);
+        $rf_link_level_timestamp = $device['attributes']['rfLinkLevel']['timestamp'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link level timestamp: ' . $rf_link_level_timestamp, 0);
+        $serial = $device['attributes']['serial']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
+        $rf_link_state = $device['attributes']['rfLinkState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
+
+        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
+    }
+
+    /** Get Irrigation Control Data
+     * @param $device
+     * @return array
+     */
+    private function GetIrrigationControlData($device)
+    {
+        $id = $device['id'];
+        $name = $device['attributes']['name']['value'];
+        $serial = $device['attributes']['serial']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
+        $rf_link_state = $device['attributes']['rfLinkState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
+        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
+    }
+
+    /***********************************************************
+     * Configuration Form
+     ***********************************************************/
+
+    /**
+     * build configuration form
+     * @return string
+     */
     public function GetConfigurationForm()
     {
-        $data = json_decode(file_get_contents(__DIR__ . '/form.json'));
-
-        //Check Connect availability
-        $ids = IPS_GetInstanceListByModuleID('{9486D575-BE8C-4ED8-B5B5-20930E26DE6F}');
-        if (IPS_GetInstance($ids[0])['InstanceStatus'] != 102) {
-            $data->actions[0]->label = 'Error: Symcon Connect is not active!';
-        } else {
-            $data->actions[0]->label = 'Status: Symcon Connect is OK!';
-        }
-
-        //Check Sonos connection
-        if ($this->ReadAttributeString('Token') == '') {
-            $data->actions[1]->label = 'Gardena: Please register with your Gardena account!';
-        } else {
-            /*
-            $result = json_decode(@$this->GetData($this->apiURL . '/v1/site'));
-
-            if ($result === false || $result === null || !is_countable($result)) {
-                $data->actions[1]->label = 'TaHoma: Error. Please check your internet connection or register again!';
-            } else {
-                $data->actions[1]->label = 'Gardena: ' . sprintf('Found %d Sites', count($result));
-            }
-            */
-
-        }
-
-        return json_encode($data);
+        // return current form
+        $Form = json_encode([
+            'elements' => $this->FormHead(),
+            'actions' => $this->FormActions(),
+            'status' => $this->FormStatus()
+        ]);
+        $this->SendDebug('FORM', $Form, 0);
+        $this->SendDebug('FORM', json_last_error_msg(), 0);
+        return $Form;
     }
 
+    /**
+     * return form configurations on configuration step
+     * @return array
+     */
+    protected function FormHead()
+    {
+        $location_id = $this->ReadAttributeString('location_id');
+        if ($location_id == '') {
+            $show_config = false;
+        } else {
+            $show_config = true;
+        }
+        $visibility_register = false;
+        //Check Gardena connection
+        if ($this->ReadAttributeString('Token') == '') {
+            $visibility_register = true;
+        }
+
+        $form = [
+            [
+                'type' => 'Label',
+                'visible' => $visibility_register,
+                'caption' => 'Gardena: Please register with your Gardena account!'
+            ],
+            [
+                'type' => 'Button',
+                'visible' => true,
+                'caption' => 'Register',
+                'onClick' => 'echo GARDENA_Register($id);'
+            ],
+            [
+                'type' => 'Label',
+                'visible' => true,
+                'label' => 'Update interval in seconds:'
+            ],
+            [
+                'name' => 'UpdateInterval',
+                'visible' => true,
+                'type' => 'IntervalBox',
+                'caption' => 'seconds'
+            ]
+        ];
+        return $form;
+    }
+
+    /**
+     * return form actions by token
+     * @return array
+     */
+    protected function FormActions()
+    {
+        //Check Connect availability
+        $ids = IPS_GetInstanceListByModuleID('{9486D575-BE8C-4ED8-B5B5-20930E26DE6F}');
+        if (IPS_GetInstance($ids[0])['InstanceStatus'] != IS_ACTIVE) {
+            $visibility_label1 = true;
+            $visibility_label2 = false;
+        } else {
+            $visibility_label1 = false;
+            $visibility_label2 = true;
+        }
+        $location_id = $this->ReadAttributeString('location_id');
+        $location_name = $this->ReadAttributeString('location_name');
+        if ($location_id != '') {
+            $visibility_config = true;
+        } else {
+            $visibility_config = false;
+        }
+       $form = [
+            [
+                'type' => 'Label',
+                'visible' => $visibility_label1,
+                'caption' => 'Error: Symcon Connect is not active!'
+            ],
+            [
+                'type' => 'Label',
+                'visible' => $visibility_label2,
+                'caption' => 'Status: Symcon Connect is OK!'
+            ],
+           [
+               'type' => 'Label',
+               'visible' => $visibility_config,
+               'caption' => $this->Translate('Gardena Location: ') . $location_name
+           ],
+            [
+                'type' => 'Label',
+                'visible' => true,
+                'caption' => 'Read Gardena configuration:'
+            ],
+            [
+                'type' => 'Button',
+                'visible' => true,
+                'caption' => 'Read configuration',
+                'onClick' => 'GARDENA_GetConfiguration($id);'
+            ]
+        ];
+        return $form;
+    }
+
+    /**
+     * return from status
+     * @return array
+     */
+    protected function FormStatus()
+    {
+        $form = [
+            [
+                'code' => IS_CREATING,
+                'icon' => 'inactive',
+                'caption' => 'Creating instance.'
+            ],
+            [
+                'code' => IS_ACTIVE,
+                'icon' => 'active',
+                'caption' => 'configuration valid.'
+            ],
+            [
+                'code' => IS_INACTIVE,
+                'icon' => 'inactive',
+                'caption' => 'interface closed.'
+            ],
+            [
+                'code' => 201,
+                'icon' => 'inactive',
+                'caption' => 'Please follow the instructions.'
+            ],
+            [
+                'code' => 202,
+                'icon' => 'error',
+                'caption' => 'no category selected.'
+            ]
+        ];
+
+        return $form;
+    }
 }

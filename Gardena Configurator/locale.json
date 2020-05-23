@@ -3,9 +3,6 @@
     "de": {
       "Register": "Registrieren",
       "Gardena: Please register with your Gardena account!": "Bitte mit dem Gardena Benutzerkonto registrieren!",
-      "Update interval in seconds:": "Aktualisierungsinterval in Sekunden",
-      "seconds": "Sekunden",
-      "Gardena Location: ": "Gardena Standort: ",
       "Status: Symcon Connect is OK!": "Status: Symcon Connect ist OK!",
       "Error: Symcon Connect is not active!": "Error: Symcon Connect is nicht aktiv!",
       "category for Gardena devices": "Kategorie für Gardena Geräte",
@@ -13,6 +10,7 @@
       "name": "Name",
       "serial": "Seriennummer",
       "rf link state": "RF Link Status",
+      "model type": "Modell Typ",
       "Read Gardena configuration:": "Gardena Konfiguration auslesen:",
       "Read configuration": "Konfiguration auslesen",
       "Creating instance.": "Die Instanz wird erstellt.",
