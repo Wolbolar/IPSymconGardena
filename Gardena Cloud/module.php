@@ -330,7 +330,6 @@ class GardenaCloud extends IPSModule
         {
             $this->WriteAttributeString('snapshot', $snapshot);
         }
-        $this->WriteAttributeString('snapshot', $snapshot);
         return $snapshot;
     }
 
