@@ -439,7 +439,7 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
 
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
@@ -456,7 +456,7 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
 
@@ -553,18 +553,20 @@ class GardenaDevice extends IPSModule
         $model_type_instance = $this->ReadPropertyString('model_type');
         if($model_type_instance == self::GARDENA_smart_Irrigation_Control)
         {
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Irrigation_Control, 0);
+            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
         }
 
         if($model_type_instance == self::GARDENA_smart_Sensor)
         {
+            $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
             $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
             $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_STRING, true);
             $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_STRING);
             $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
             $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_STRING);
             $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
