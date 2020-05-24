@@ -8,6 +8,7 @@ class GardenaCloud extends IPSModule
     // GARDENA smart system API
     private const SMART_SYSTEM_BASE_URL = 'https://api.smart.gardena.dev/v1';
     private const LOCATIONS = '/locations';
+    private const WEBSOCKET ='/websocket';
     private const APIKEY = 'b42b22bf-5482-4f0b-b78a-9c5558ff5b4a';
 
     public function Create()
@@ -15,7 +16,7 @@ class GardenaCloud extends IPSModule
         //Never delete this line!
         parent::Create();
 
-        $this->RegisterPropertyInteger("UpdateInterval", 60);
+        $this->RegisterPropertyInteger("UpdateInterval", 6000);
         $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
         $this->RegisterAttributeString('location_id', '');
@@ -257,16 +258,48 @@ class GardenaCloud extends IPSModule
         $result = file_get_contents($url, false, $context);
 
         if ((strpos($http_response_header[0], '200') === false)) {
-            $this->SendDebug('HTTP Response Header', $http_response_header[0] . PHP_EOL . $result, 0);
+            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
+            $this->GetErrorMessage($result);
             return false;
         }
-
         return $result;
+    }
 
+    private function GetErrorMessage($result)
+    {
+        if($result == '{"message":"Limit Exceeded"}')
+        {
+            $this->SendDebug('Gardena API', 'Limit Exceeded', 0);
+        }
     }
 
 
     // GARDENA smart system API
+
+
+    /** Announce your desire to receive realtime events.
+     * @return string
+     */
+    public function GetWebSocket()
+    {
+        $locationId = $this->ReadAttributeString('location_id');
+        $this->SendDebug('Gardena Location ID', $locationId, 0);
+        $websocket_response = '';
+        if($locationId != '')
+        {
+            $service_id = 'request-12312'; // todo
+            $payload = ['data' => [
+                'id'=> $service_id,
+                'type'=> 'WEBSOCKET',
+                'attributes'=> [
+                    'locationId'=> $locationId
+                ]
+            ]];
+            $data = json_encode($payload);
+            $websocket_response = $this->PostData(self::SMART_SYSTEM_BASE_URL . self::WEBSOCKET, $data);
+        }
+        return $websocket_response;
+    }
 
     // Snapshot
     //Fetch current state of devices. Rate limited, so frequent polling not possible.
@@ -282,7 +315,28 @@ class GardenaCloud extends IPSModule
         } else {
             $snapshot = '[]';
         }
-        $this->WriteAttributeString('snapshot', $snapshot);
+        $this->SendDebug('Gardena Location Snapshot', $snapshot, 0);
+        if($snapshot  === false)
+        {
+            $snapshot = '[]';
+        }
+        else
+        {
+            $this->WriteAttributeString('snapshot', $snapshot);
+        }
+        return $snapshot;
+    }
+
+    public function RequestSnapshotBuffer()
+    {
+        // $this->WriteAttributeString('snapshot', '[]');
+        $snapshot = $this->ReadAttributeString('snapshot');
+        $this->SendDebug('Gardena Location Snapshot Buffer', $snapshot, 0);
+        if($snapshot == '[]')
+        {
+            $snapshot = $this->RequestSnapshot();
+            $this->SendDebug('Gardena Request Snapshot', $snapshot, 0);
+        }
         return $snapshot;
     }
 
@@ -316,28 +370,53 @@ class GardenaCloud extends IPSModule
 
     private function PutData($url, $content)
     {
-        $opts = [
-            'http' => [
-                'method' => 'PUT',
-                'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/json' . "\r\n"
+        $this->SendDebug("AT", $this->FetchAccessToken(), 0);
+
+        $opts = array(
+            "http" => array(
+                "method" => "PUT",
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/json' . "\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
-                'content' => $content]];
+                'content' => $content,
+                "ignore_errors" => true
+            )
+        );
         $context = stream_context_create($opts);
 
-        return file_get_contents($url, false, $context);
+        $result = file_get_contents($url, false, $context);
+
+        if ((strpos($http_response_header[0], '200') === false)) {
+            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
+            $this->GetErrorMessage($result);
+            return false;
+        }
+        return $result;
     }
 
     private function PostData($url, $content)
     {
-        $opts = [
-            'http' => [
-                'method' => 'POST',
-                'header' => 'Authorization: Bearer ' . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/json' . "\r\n"
+
+        $this->SendDebug("AT", $this->FetchAccessToken(), 0);
+
+        $opts = array(
+            "http" => array(
+                "method" => "POST",
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/json' . "\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
-                'content' => $content]];
+                'content' => $content,
+                "ignore_errors" => true
+            )
+        );
         $context = stream_context_create($opts);
 
-        return file_get_contents($url, false, $context);
+        $result = file_get_contents($url, false, $context);
+
+        if ((strpos($http_response_header[0], '200') === false)) {
+            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
+            $this->GetErrorMessage($result);
+            return false;
+        }
+        return $result;
     }
 
     public function ForwardData($data)
@@ -349,12 +428,12 @@ class GardenaCloud extends IPSModule
             if($type == 'PUT')
             {
                 $this->SendDebug('ForwardData', $data->Endpoint . ', Payload: ' . $data->Payload, 0);
-                return $this->PutData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
+                $response = $this->PutData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
             }
             elseif($type == 'POST')
             {
                 $this->SendDebug('ForwardData', $data->Endpoint . ', Payload: ' . $data->Payload, 0);
-                return $this->PostData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
+                $response = $this->PostData(self::SMART_SYSTEM_BASE_URL . $data->Endpoint, $data->Payload);
             }
         } else {
             $this->SendDebug('ForwardData', $data->Endpoint, 0);
@@ -366,6 +445,10 @@ class GardenaCloud extends IPSModule
             {
                 $response = $this->RequestSnapshot();
             }
+            elseif($data->Endpoint == 'snapshotbuffer')
+            {
+                $response = $this->RequestSnapshotBuffer();
+            }
             elseif($data->Endpoint == 'request_location_id')
             {
                 $response = $this->RequestLocations();
@@ -374,8 +457,8 @@ class GardenaCloud extends IPSModule
             {
                 $response = $this->CheckToken();
             }
-            return $response;
         }
+        return $response;
     }
 
     /** Get Device Type
@@ -463,12 +546,6 @@ class GardenaCloud extends IPSModule
      */
     protected function FormHead()
     {
-        $location_id = $this->ReadAttributeString('location_id');
-        if ($location_id == '') {
-            $show_config = false;
-        } else {
-            $show_config = true;
-        }
         $visibility_register = false;
         //Check Gardena connection
         if ($this->ReadAttributeString('Token') == '') {
