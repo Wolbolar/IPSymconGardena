@@ -85,7 +85,7 @@ class GardenaCloud extends IPSModule
 
     private function SetGardenaInterval($gardena_interval): void
     {
-        if($gardena_interval < 15)
+        if($gardena_interval < 15 && $gardena_interval != 0)
         {
             $gardena_interval = 15;
         }
