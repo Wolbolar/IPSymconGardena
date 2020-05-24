@@ -26,6 +26,12 @@ class GardenaDevice extends IPSModule
         $this->RegisterPropertyString('name', '');
         $this->RegisterPropertyString('serial', '');
         $this->RegisterPropertyString('model_type', '');
+        $this->RegisterAttributeString('VALVE_1_NAME', 'Valve 1');
+        $this->RegisterAttributeString('VALVE_2_NAME', 'Valve 2');
+        $this->RegisterAttributeString('VALVE_3_NAME', 'Valve 3');
+        $this->RegisterAttributeString('VALVE_4_NAME', 'Valve 4');
+        $this->RegisterAttributeString('VALVE_5_NAME', 'Valve 5');
+        $this->RegisterAttributeString('VALVE_6_NAME', 'Valve 6');
         $this->RegisterAttributeBoolean('VALVE_1_STATE', false);
         $this->RegisterAttributeBoolean('VALVE_1_STATE_enabled', false);
         $this->RegisterAttributeBoolean('VALVE_2_STATE', false);
@@ -134,23 +140,29 @@ class GardenaDevice extends IPSModule
         $this->GetDeviceStatus();
         if($model_type == self::GARDENA_smart_Irrigation_Control)
         {
+            $valve_1_name = $this->ReadAttributeString('VALVE_1_NAME');
             $this->SetupVariable(
-                'VALVE_1_STATE', $this->Translate('valve 1'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_1_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_2_name = $this->ReadAttributeString('VALVE_2_NAME');
             $this->SetupVariable(
-                'VALVE_2_STATE', $this->Translate('valve 2'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_2_STATE', $this->Translate($valve_2_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_3_name = $this->ReadAttributeString('VALVE_3_NAME');
             $this->SetupVariable(
-                'VALVE_3_STATE', $this->Translate('valve 3'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_3_STATE', $this->Translate($valve_3_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_4_name = $this->ReadAttributeString('VALVE_4_NAME');
             $this->SetupVariable(
-                'VALVE_4_STATE', $this->Translate('valve 4'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_4_STATE', $this->Translate($valve_4_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_5_name = $this->ReadAttributeString('VALVE_5_NAME');
             $this->SetupVariable(
-                'VALVE_5_STATE', $this->Translate('valve 5'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_5_STATE', $this->Translate($valve_5_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_6_name = $this->ReadAttributeString('VALVE_6_NAME');
             $this->SetupVariable(
-                'VALVE_6_STATE', $this->Translate('valve 6'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_6_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
             /*
             $this->SetupVariable(
@@ -390,6 +402,22 @@ class GardenaDevice extends IPSModule
         return $this->ReadAttributeString('Valve_ID_' . $index);
     }
 
+
+    private function GetValveData($device)
+    {
+        $name = $device['attributes']['name']['value'];
+        $valve_id = explode(':', $device['id']);
+        $id = $valve_id[0];
+        $valve_key = $valve_id[1];
+        $instance_id = $this->ReadPropertyString('id');
+        if($instance_id == $id)
+        {
+            $this->SendDebug('Gardena Valve ' . $id, $name, 0);
+            $this->WriteAttributeString('VALVE_' . $valve_key . '_NAME', $name);
+        }
+        return $name;
+    }
+
     /** Get Device Type
      * @param $device
      */
@@ -508,6 +536,10 @@ class GardenaDevice extends IPSModule
             $included = $payload['included'];
             foreach ($included as $device) {
                 $type = $device['type'];
+                if($type == 'VALVE')
+                {
+                    $this->GetValveData($device);
+                }
                 if ($type == 'COMMON') {
                     $this->GetDeviceData($device);
                 }
