@@ -16,7 +16,7 @@ class GardenaCloud extends IPSModule
         //Never delete this line!
         parent::Create();
 
-        $this->RegisterPropertyInteger("UpdateInterval", 6000);
+        $this->RegisterPropertyInteger("UpdateInterval", 15);
         $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
         $this->RegisterAttributeString('location_id', '');
@@ -83,7 +83,11 @@ class GardenaCloud extends IPSModule
 
     private function SetGardenaInterval($gardena_interval): void
     {
-        $interval     = $gardena_interval * 1000;
+        if($gardena_interval < 15)
+        {
+            $gardena_interval = 15;
+        }
+        $interval     = $gardena_interval * 1000  * 60; // minutes
         $this->SetTimerInterval('Update', $interval);
     }
 
@@ -567,13 +571,13 @@ class GardenaCloud extends IPSModule
             [
                 'type' => 'Label',
                 'visible' => true,
-                'label' => 'Update interval in seconds:'
+                'label' => 'Update interval in minutes (minimum 15 minutes):'
             ],
             [
                 'name' => 'UpdateInterval',
                 'visible' => true,
                 'type' => 'IntervalBox',
-                'caption' => 'seconds'
+                'caption' => 'minutes'
             ]
         ];
         return $form;
