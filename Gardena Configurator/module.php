@@ -52,6 +52,7 @@ class GardenaConfigurator extends IPSModule
         } else {
             $snapshot = '[]';
         }
+        $this->SendDebug('Gardena Request Response', $snapshot, 0);
         $this->WriteAttributeString('location_snapshot', $snapshot);
         return $snapshot;
     }

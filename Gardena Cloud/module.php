@@ -77,8 +77,10 @@ class GardenaCloud extends IPSModule
     public function UpdateStatus()
     {
         $snapshot = $this->RequestSnapshot();
+
         $this->SendDebug('Send Snapshot', $snapshot, 0);
         $this->SendDataToChildren(json_encode(Array("DataID" => "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}", "Buffer" => $snapshot)));
+        return $snapshot;
     }
 
     private function SetGardenaInterval($gardena_interval): void
@@ -328,6 +330,7 @@ class GardenaCloud extends IPSModule
         {
             $this->WriteAttributeString('snapshot', $snapshot);
         }
+        $this->WriteAttributeString('snapshot', $snapshot);
         return $snapshot;
     }
 
@@ -361,15 +364,19 @@ class GardenaCloud extends IPSModule
         return $location_id;
     }
 
+    /** Get Gardena Configuration
+     * @return bool|false|string
+     */
     public function GetConfiguration()
     {
         $location_id = $this->ReadAttributeString('location_id');
         if ($location_id != '') {
-            $this->RequestSnapshot();
+            $snapshot = $this->RequestSnapshot();
         } else {
             $this->RequestLocations();
-            $this->RequestSnapshot();
+            $snapshot = $this->RequestSnapshot();
         }
+        return $snapshot;
     }
 
     private function PutData($url, $content)
