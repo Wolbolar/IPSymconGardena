@@ -152,9 +152,11 @@ class GardenaDevice extends IPSModule
             $this->SetupVariable(
                 'VALVE_6_STATE', $this->Translate('valve 6'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            /*
             $this->SetupVariable(
                 'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
             );
+            */
         }
 
         if($model_type == self::GARDENA_smart_Sensor)
@@ -179,10 +181,11 @@ class GardenaDevice extends IPSModule
             $this->SetupVariable(
                 'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
             );
-
+            /*
             $this->SetupVariable(
                 'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
             );
+            */
 
             $this->SetupVariable(
                 'soil_humidity', $this->Translate('soil humidity'), '~Humidity', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true

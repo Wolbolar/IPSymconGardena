@@ -354,13 +354,17 @@ class GardenaCloud extends IPSModule
     {
         $state_location = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
         $this->SendDebug('Gardena Locations', $state_location, 0);
-        $location_data = json_decode($state_location, true);
-        $location_id = $location_data['data'][0]['id'];
-        $location_name = $location_data['data'][0]['attributes']['name'];
-        $this->SendDebug('Gardena Location Name', $location_name, 0);
-        $this->WriteAttributeString('location_name', $location_name);
-        $this->SendDebug('Gardena Location ID', $location_id, 0);
-        $this->WriteAttributeString('location_id', $location_id);
+        $location_id = false;
+        if(!$state_location === false)
+        {
+            $location_data = json_decode($state_location, true);
+            $location_id = $location_data['data'][0]['id'];
+            $location_name = $location_data['data'][0]['attributes']['name'];
+            $this->SendDebug('Gardena Location Name', $location_name, 0);
+            $this->WriteAttributeString('location_name', $location_name);
+            $this->SendDebug('Gardena Location ID', $location_id, 0);
+            $this->WriteAttributeString('location_id', $location_id);
+        }
         return $location_id;
     }
 
@@ -373,8 +377,11 @@ class GardenaCloud extends IPSModule
         if ($location_id != '') {
             $snapshot = $this->RequestSnapshot();
         } else {
-            $this->RequestLocations();
-            $snapshot = $this->RequestSnapshot();
+            $locations = $this->RequestLocations();
+            if(!$locations === false)
+            {
+                $snapshot = $this->RequestSnapshot();
+            }
         }
         return $snapshot;
     }

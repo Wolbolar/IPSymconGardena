@@ -79,11 +79,15 @@ class GardenaConfigurator extends IPSModule
     {
         $location_id = $this->RequestDataFromParent('location_id');
         if ($location_id != '') {
-            $this->RequestSnapshot();
+            $snapshot = $this->RequestSnapshot();
         } else {
-            $this->RequestLocations();
-            $this->RequestSnapshot();
+            $locations = $this->RequestLocations();
+            if(!$locations === false)
+            {
+                $snapshot = $this->RequestSnapshot();
+            }
         }
+        return $snapshot;
     }
 
     public function RequestDataFromParent(string $endpoint)
