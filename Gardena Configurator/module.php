@@ -9,6 +9,7 @@ class GardenaConfigurator extends IPSModule
         parent::Create();
         $this->ConnectParent('{9775D7CA-5667-8554-0172-2EBB2F553A54}');
         $this->RegisterPropertyInteger("ImportCategoryID", 0);
+        $this->RegisterAttributeString('location_snapshot', '[]');
     }
 
     public function ApplyChanges()
@@ -47,11 +48,21 @@ class GardenaConfigurator extends IPSModule
     {
         $location_id = $this->RequestDataFromParent('location_id');
         if ($location_id != '') {
-            $snapshot = $this->RequestDataFromParent('snapshot');
+            $snapshot = $this->RequestDataFromParent('snapshotbuffer');
         } else {
-            $snapshot = false;
+            $snapshot = '[]';
         }
+        $this->WriteAttributeString('location_snapshot', $snapshot);
         return $snapshot;
+    }
+
+    /** Get Snapshot
+     * @return bool|false|string
+     */
+    public function RequestSnapshotBuffer()
+    {
+        // $this->WriteAttributeString('location_snapshot', '[]');
+        return $this->ReadAttributeString('location_snapshot');
     }
 
     /** Get Locations
@@ -82,7 +93,7 @@ class GardenaConfigurator extends IPSModule
             'Endpoint' => $endpoint,
             'Payload'  => ''
         ]));
-        $this->SendDebug('Gardena Request Response', $data, 0);
+        $this->SendDebug('Gardena Request Response', $endpoint . ": " . $data, 0);
         return $data;
     }
 
@@ -157,10 +168,11 @@ class GardenaConfigurator extends IPSModule
         $location_id = $this->RequestDataFromParent('location_id');
         if ($location_id != '') {
             $GardenaInstanceIDList = IPS_GetInstanceListByModuleID('{3B073BE1-6556-037C-42FB-6311BC452C68}'); // Gardena Devices
-            $snapshot = $this->RequestSnapshot(); // Get Snapshot
+            $snapshot = $this->RequestSnapshotBuffer(); // Get Snapshot
             $this->SendDebug('Gardena Config', $snapshot, 0);
-            if (!empty($snapshot)) {
-                $payload = json_decode($snapshot, true);
+            $payload = json_decode($snapshot, true);
+            $counter = count($payload);
+            if ($counter > 0) {
                 $included = $payload['included'];
                 foreach ($included as $device) {
                     $instanceID = 0;
