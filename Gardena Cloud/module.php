@@ -262,21 +262,43 @@ class GardenaCloud extends IPSModule
         $context = stream_context_create($opts);
 
         $result = file_get_contents($url, false, $context);
-
-        if ((strpos($http_response_header[0], '200') === false)) {
-            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
-            $this->GetErrorMessage($result);
-            return false;
-        }
+        $http_error = $http_response_header[0];
+        $result = $this->GetErrorMessage($http_error, $result);
         return $result;
     }
 
-    private function GetErrorMessage($result)
+    private function GetErrorMessage($http_error, $result)
     {
+        $response =  $result;
+        if ((strpos($http_error, '200') > 0)) {
+            $this->SendDebug('HTTP Response Header',  'Success. Response Body: ' . $result, 0);
+        }
+        elseif((strpos($http_error, '401') > 0)) {
+            $this->SendDebug('HTTP Response Header', 'Failure, user could not be authenticated. Authorization-Provider or X-Api-Key header or Beaerer Token missing or invalid. Response Body: ' . $result, 0);
+            $response =  false;
+        }
+        elseif((strpos($http_error, '404') > 0)) {
+            $this->SendDebug('HTTP Response Header', 'Failure, location not found. Response Body: ' . $result, 0);
+            $response =  false;
+        }
+        elseif((strpos($http_error, '500') > 0)) {
+            $this->SendDebug('HTTP Response Header', 'Failure, internal error. Response Body: ' . $result, 0);
+            $response =  false;
+        }
+        elseif((strpos($http_error, '502') > 0)) {
+            $this->SendDebug('HTTP Response Header', 'Failure, backend error. Response Body: ' . $result, 0);
+            $response =  false;
+        }
+        else{
+            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
+            $response =  false;
+        }
+
         if($result == '{"message":"Limit Exceeded"}')
         {
             $this->SendDebug('Gardena API', 'Limit Exceeded', 0);
         }
+        return $response;
     }
 
 
@@ -321,13 +343,14 @@ class GardenaCloud extends IPSModule
         } else {
             $snapshot = '[]';
         }
-        $this->SendDebug('Gardena Location Snapshot', $snapshot, 0);
         if($snapshot  === false)
         {
+            $this->SendDebug('Gardena Location Snapshot', 'Could not get snapshot', 0);
             $snapshot = '[]';
         }
         else
         {
+            $this->SendDebug('Gardena Location Snapshot', $snapshot, 0);
             $this->WriteAttributeString('snapshot', $snapshot);
         }
         return $snapshot;

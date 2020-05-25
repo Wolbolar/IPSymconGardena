@@ -591,20 +591,20 @@ class GardenaDevice extends IPSModule
         {
             $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
             $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_STRING, true);
-            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
             // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
             $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('ambient_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('light_intensity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_INTEGER);
         }
     }
 
