@@ -26,12 +26,12 @@ class GardenaDevice extends IPSModule
         $this->RegisterPropertyString('name', '');
         $this->RegisterPropertyString('serial', '');
         $this->RegisterPropertyString('model_type', '');
-        $this->RegisterAttributeString('VALVE_1_NAME', 'Valve 1');
-        $this->RegisterAttributeString('VALVE_2_NAME', 'Valve 2');
-        $this->RegisterAttributeString('VALVE_3_NAME', 'Valve 3');
-        $this->RegisterAttributeString('VALVE_4_NAME', 'Valve 4');
-        $this->RegisterAttributeString('VALVE_5_NAME', 'Valve 5');
-        $this->RegisterAttributeString('VALVE_6_NAME', 'Valve 6');
+        $this->RegisterAttributeString('VALVE_1_NAME', 'valve 1');
+        $this->RegisterAttributeString('VALVE_2_NAME', 'valve 2');
+        $this->RegisterAttributeString('VALVE_3_NAME', 'valve 3');
+        $this->RegisterAttributeString('VALVE_4_NAME', 'valve 4');
+        $this->RegisterAttributeString('VALVE_5_NAME', 'valve 5');
+        $this->RegisterAttributeString('VALVE_6_NAME', 'valve 6');
         $this->RegisterAttributeBoolean('VALVE_1_STATE', false);
         $this->RegisterAttributeBoolean('VALVE_1_STATE_enabled', false);
         $this->RegisterAttributeBoolean('VALVE_2_STATE', false);
