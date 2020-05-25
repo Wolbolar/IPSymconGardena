@@ -7,10 +7,134 @@ class GardenaCloud extends IPSModule
 
     // GARDENA smart system API
     private const SMART_SYSTEM_BASE_URL = 'https://api.smart.gardena.dev/v1';
+    private const AUTOMOVER_CONNECT_SYSTEM_BASE_URL = 'https://api.amc.husqvarna.dev/v1';
     private const LOCATIONS = '/locations';
     private const WEBSOCKET ='/websocket';
     private const APIKEY = 'b42b22bf-5482-4f0b-b78a-9c5558ff5b4a';
+    // mover mode
+    private const MAIN_AREA = 'MAIN_AREA'; // Mower will mow until low battery. Go home and charge. Leave and continue mowing. Week schedule is used. Schedule can be overridden with forced park or forced mowing.
+    private const DEMO = 'DEMO'; // Same as main area, but shorter times. No blade operation.
+    private const SECONDARY_AREA = 'SECONDARY_AREA'; // Mower is in secondary area. Schedule is overridden with forced park or forced mowing. Mower will mow for request time or untill the battery runs out.
+    private const HOME = 'HOME'; // Mower goes home and parks forever. Week schedule is not used. Cannot be overridden with forced mowing.
+    private const UNKNOWN = 'UNKNOWN'; // Unknown mode
+    // mover activity
+    private const ACIVITY_UNKNOWN = 'UNKNOWN'; // Unknown activity.
+    private const NOT_APPLICABLE = 'NOT_APPLICABLE'; // Manual start required in mower.
+    private const MOWING = 'MOWING'; // Mower is mowing lawn. If in demo mode the blades are not in operation.
+    private const GOING_HOME = 'GOING_HOME'; // Mower is going home to the charging station.
+    private const CHARGING = 'CHARGING'; // Mower is charging in station due to low battery.
+    private const LEAVING = 'LEAVING'; // Mower is leaving the charging station.
+    private const PARKED_IN_CS = 'PARKED_IN_CS'; // Mower is parked in charging station.
+    private const STOPPED_IN_GARDEN = 'STOPPED_IN_GARDEN'; // Mower has stopped. Needs manual action to resume.
+    // mover state
+    private const STATE_UNKNOWN = 'UNKNOWN'; // Unknown state.
+    private const STATE_NOT_APPLICABLE = 'NOT_APPLICABLE';
+    private const STATE_PAUSED = 'PAUSED'; // Mower has been paused by user.
+    private const STATE_IN_OPERATION = 'IN_OPERATION'; // See value in activity for status.
+    private const STATE_WAIT_UPDATING = 'WAIT_UPDATING'; // Mower is downloading new firmware.
+    private const STATE_WAIT_POWER_UP = 'WAIT_POWER_UP'; // Mower is performing power up tests.
+    private const STATE_RESTRICTED = 'RESTRICTED'; // Mower can currently not mow due to week calender, or override park.
+    private const STATE_OFF = 'OFF'; // Mower is turned off.
+    private const STATE_STOPPED = 'STOPPED'; // Mower is stopped requires manual action.
+    private const STATE_ERROR = 'ERROR'; // An error has occurred. Check errorCode. Mower requires manual action.
+    private const STATE_FATAL_ERROR = 'FATAL_ERROR'; // An error has occurred. Check errorCode. Mower requires manual action.
+    private const STATE_ERROR_AT_POWER_UP = 'ERROR_AT_POWER_UP'; // An error has occurred. Check errorCode. Mower requires manual action.
 
+
+    // error codes mover
+    /*
+     * 0    Unexpected error
+1    Outside working area
+2    No loop signal
+3    Wrong loop signal
+4    Loop sensor problem, front
+5    Loop sensor problem, rear
+6    Loop sensor problem, left
+7    Loop sensor problem, right
+8    Wrong PIN code
+9    Trapped
+10    Upside down
+11    Low battery
+12    Empty battery
+13    No drive
+14    Mower lifted
+15    Lifted
+16    Stuck in charging station
+17    Charging station blocked
+18    Collision sensor problem, rear
+19    Collision sensor problem, front
+20    Wheel motor blocked, right
+21    Wheel motor blocked, left
+22    Wheel drive problem, right
+23    Wheel drive problem, left
+24    Cutting system blocked
+25    Cutting system blocked
+26    Invalid sub-device combination
+27    Settings restored
+28    Memory circuit problem
+29    Slope too steep
+30    Charging system problem
+31    STOP button problem
+32    Tilt sensor problem
+33    Mower tilted
+34    Cutting stopped - slope too steep
+35    Wheel motor overloaded, right
+36    Wheel motor overloaded, left
+37    Charging current too high
+38    Electronic problem
+39    Cutting motor problem
+40    Limited cutting height range
+41    Unexpected cutting height adj
+42    Limited cutting height range
+43    Cutting height problem, drive
+44    Cutting height problem, curr
+45    Cutting height problem, dir
+46    Cutting height blocked
+47    Cutting height problem
+48    No response from charger
+49    Ultrasonic problem
+50    Guide 1 not found
+51    Guide 2 not found
+52    Guide 3 not found
+53    GPS navigation problem
+54    Weak GPS signal
+55    Difficult finding home
+56    Guide calibration accomplished
+57    Guide calibration failed
+58    Temporary battery problem
+59    Temporary battery problem
+60    Temporary battery problem
+61    Temporary battery problem
+62    Temporary battery problem
+63    Temporary battery problem
+64    Temporary battery problem
+65    Temporary battery problem
+66    Battery problem
+67    Battery problem
+68    Temporary battery problem
+69    Alarm! Mower switched off
+70    Alarm! Mower stopped
+71    Alarm! Mower lifted
+72    Alarm! Mower tilted
+73    Alarm! Mower in motion
+74    Alarm! Outside geofence
+75    Connection changed
+76    Connection NOT changed
+77    Com board not available
+78    Slipped - Mower has Slipped.Situation not solved with moving pattern
+79    Invalid battery combination - Invalid combination of different battery types.
+80    Cutting system imbalance    Warning
+81    Safety function faulty
+82    Wheel motor blocked, rear right
+83    Wheel motor blocked, rear left
+84    Wheel drive problem, rear right
+85    Wheel drive problem, rear left
+86    Wheel motor overloaded, rear right
+87    Wheel motor overloaded, rear left
+88    Angular sensor problem
+89    Invalid system configuration
+90    No power in charging station
+     */
     public function Create()
     {
         //Never delete this line!
@@ -374,11 +498,15 @@ class GardenaCloud extends IPSModule
      */
     public function RequestLocations()
     {
-        $state_location = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
-        $this->SendDebug('Gardena Locations', $state_location, 0);
         $location_id = false;
-        if(!$state_location === false)
+        $state_location = $this->FetchData(self::SMART_SYSTEM_BASE_URL . self::LOCATIONS);
+        if($state_location === false)
         {
+            $this->SendDebug('Gardena Locations', 'Could not get location', 0);
+        }
+        else
+        {
+            $this->SendDebug('Gardena Locations', strval($state_location), 0);
             $location_data = json_decode($state_location, true);
             $location_id = $location_data['data'][0]['id'];
             $location_name = $location_data['data'][0]['attributes']['name'];
