@@ -3,8 +3,9 @@
     "de": {
       "Register": "Registrieren",
       "Gardena: Please register with your Gardena account!": "Bitte mit dem Gardena Benutzerkonto registrieren!",
-      "Update interval in seconds:": "Aktualisierungsinterval in Sekunden",
+      "Update interval in minutes (minimum 15 minutes):": "Aktualisierungsinterval in Minuten (minimum 15 Minuten):",
       "seconds": "Sekunden",
+      "minutes": "Minuten",
       "Gardena Location: ": "Gardena Standort: ",
       "Status: Symcon Connect is OK!": "Status: Symcon Connect ist OK!",
       "Error: Symcon Connect is not active!": "Error: Symcon Connect is nicht aktiv!",

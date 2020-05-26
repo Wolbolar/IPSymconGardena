@@ -26,6 +26,12 @@ class GardenaDevice extends IPSModule
         $this->RegisterPropertyString('name', '');
         $this->RegisterPropertyString('serial', '');
         $this->RegisterPropertyString('model_type', '');
+        $this->RegisterAttributeString('VALVE_1_NAME', 'valve 1');
+        $this->RegisterAttributeString('VALVE_2_NAME', 'valve 2');
+        $this->RegisterAttributeString('VALVE_3_NAME', 'valve 3');
+        $this->RegisterAttributeString('VALVE_4_NAME', 'valve 4');
+        $this->RegisterAttributeString('VALVE_5_NAME', 'valve 5');
+        $this->RegisterAttributeString('VALVE_6_NAME', 'valve 6');
         $this->RegisterAttributeBoolean('VALVE_1_STATE', false);
         $this->RegisterAttributeBoolean('VALVE_1_STATE_enabled', false);
         $this->RegisterAttributeBoolean('VALVE_2_STATE', false);
@@ -39,27 +45,27 @@ class GardenaDevice extends IPSModule
         $this->RegisterAttributeBoolean('VALVE_6_STATE', false);
         $this->RegisterAttributeBoolean('VALVE_6_STATE_enabled', false);
         $this->RegisterAttributeInteger('BATTERY_LEVEL', 0);
-        $this->RegisterAttributeString('BATTERY_LEVEL_TIMESTAMP', '');
+        $this->RegisterAttributeInteger('BATTERY_LEVEL_TIMESTAMP', 0);
         $this->RegisterAttributeBoolean('BATTERY_LEVEL_TIMESTAMP_enabled', false);
         $this->RegisterAttributeString('BATTERY_STATE', '');
-        $this->RegisterAttributeString('BATTERY_STATE_TIMESTAMP', '');
+        $this->RegisterAttributeInteger('BATTERY_STATE_TIMESTAMP', 0);
         $this->RegisterAttributeBoolean('BATTERY_STATE_TIMESTAMP_enabled', false);
         $this->RegisterAttributeInteger('RF_LINK_LEVEL', 0);
-        $this->RegisterAttributeString('RF_LINK_LEVEL_TIMESTAMP', '');
+        $this->RegisterAttributeInteger('RF_LINK_LEVEL_TIMESTAMP', 0);
         $this->RegisterAttributeBoolean('RF_LINK_LEVEL_TIMESTAMP_enabled', false);
         $this->RegisterAttributeString('RF_LINK_STATE', '');
         $this->RegisterAttributeBoolean('RF_LINK_STATE_enabled', false);
         $this->RegisterAttributeInteger('soil_humidity', 0);
-        $this->RegisterAttributeString('soil_humidity_timestamp', '');
+        $this->RegisterAttributeInteger('soil_humidity_timestamp', 0);
         $this->RegisterAttributeBoolean('soil_humidity_timestamp_enabled', false);
         $this->RegisterAttributeFloat('soil_temperature', 0);
-        $this->RegisterAttributeString('soil_temperature_timestamp', '');
+        $this->RegisterAttributeInteger('soil_temperature_timestamp', 0);
         $this->RegisterAttributeBoolean('soil_temperature_timestamp_enabled', false);
         $this->RegisterAttributeFloat('ambient_temperature', 0);
-        $this->RegisterAttributeString('ambient_temperature_timestamp', '');
+        $this->RegisterAttributeInteger('ambient_temperature_timestamp', 0);
         $this->RegisterAttributeBoolean('ambient_temperature_timestamp_enabled', false);
         $this->RegisterAttributeInteger('light_intensity', 0);
-        $this->RegisterAttributeString('light_intensity_timestamp', '');
+        $this->RegisterAttributeInteger('light_intensity_timestamp', 0);
         $this->RegisterAttributeBoolean('light_intensity_timestamp_enabled', false);
 
         //we will wait until the kernel is ready
@@ -134,27 +140,35 @@ class GardenaDevice extends IPSModule
         $this->GetDeviceStatus();
         if($model_type == self::GARDENA_smart_Irrigation_Control)
         {
+            $valve_1_name = $this->ReadAttributeString('VALVE_1_NAME');
             $this->SetupVariable(
-                'VALVE_1_STATE', $this->Translate('valve 1'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_1_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_2_name = $this->ReadAttributeString('VALVE_2_NAME');
             $this->SetupVariable(
-                'VALVE_2_STATE', $this->Translate('valve 2'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_2_STATE', $this->Translate($valve_2_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_3_name = $this->ReadAttributeString('VALVE_3_NAME');
             $this->SetupVariable(
-                'VALVE_3_STATE', $this->Translate('valve 3'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_3_STATE', $this->Translate($valve_3_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_4_name = $this->ReadAttributeString('VALVE_4_NAME');
             $this->SetupVariable(
-                'VALVE_4_STATE', $this->Translate('valve 4'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_4_STATE', $this->Translate($valve_4_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_5_name = $this->ReadAttributeString('VALVE_5_NAME');
             $this->SetupVariable(
-                'VALVE_5_STATE', $this->Translate('valve 5'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_5_STATE', $this->Translate($valve_5_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            $valve_6_name = $this->ReadAttributeString('VALVE_6_NAME');
             $this->SetupVariable(
-                'VALVE_6_STATE', $this->Translate('valve 6'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
+                'VALVE_6_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
+            /*
             $this->SetupVariable(
                 'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
             );
+            */
         }
 
         if($model_type == self::GARDENA_smart_Sensor)
@@ -163,53 +177,54 @@ class GardenaDevice extends IPSModule
                 'BATTERY_LEVEL', $this->Translate('battery level'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
             );
             $this->SetupVariable(
-                'BATTERY_LEVEL_TIMESTAMP', $this->Translate('battery level timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'BATTERY_LEVEL_TIMESTAMP', $this->Translate('battery level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
 
             $this->SetupVariable(
                 'BATTERY_STATE', $this->Translate('battery state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
             );
             $this->SetupVariable(
-                'BATTERY_STATE_TIMESTAMP', $this->Translate('battery state timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'BATTERY_STATE_TIMESTAMP', $this->Translate('battery state timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
 
             $this->SetupVariable(
                 'RF_LINK_LEVEL', $this->Translate('rf link level'), '~Intensity.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
             );
             $this->SetupVariable(
-                'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
-
+            /*
             $this->SetupVariable(
                 'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
             );
+            */
 
             $this->SetupVariable(
                 'soil_humidity', $this->Translate('soil humidity'), '~Humidity', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
             );
             $this->SetupVariable(
-                'soil_humidity_timestamp', $this->Translate('soil humidity timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'soil_humidity_timestamp', $this->Translate('soil humidity timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
 
             $this->SetupVariable(
                 'soil_temperature', $this->Translate('soil temperature'), '~Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
             );
             $this->SetupVariable(
-                'soil_temperature_timestamp', $this->Translate('soil temperature timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'soil_temperature_timestamp', $this->Translate('soil temperature timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
 
             $this->SetupVariable(
                 'ambient_temperature', $this->Translate('ambient temperature'), '~Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
             );
             $this->SetupVariable(
-                'ambient_temperature_timestamp', $this->Translate('ambient temperature timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'ambient_temperature_timestamp', $this->Translate('ambient temperature timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
 
             $this->SetupVariable(
                 'light_intensity', $this->Translate('light intensity'), '~Illumination', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
             );
             $this->SetupVariable(
-                'light_intensity_timestamp', $this->Translate('light intensity timestamp'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'light_intensity_timestamp', $this->Translate('light intensity timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
         }
         $this->WriteValues();
@@ -387,6 +402,22 @@ class GardenaDevice extends IPSModule
         return $this->ReadAttributeString('Valve_ID_' . $index);
     }
 
+
+    private function GetValveData($device)
+    {
+        $name = $device['attributes']['name']['value'];
+        $valve_id = explode(':', $device['id']);
+        $id = $valve_id[0];
+        $valve_key = $valve_id[1];
+        $instance_id = $this->ReadPropertyString('id');
+        if($instance_id == $id)
+        {
+            $this->SendDebug('Gardena Valve ' . $id, $name, 0);
+            $this->WriteAttributeString('VALVE_' . $valve_key . '_NAME', $name);
+        }
+        return $name;
+    }
+
     /** Get Device Type
      * @param $device
      */
@@ -418,25 +449,22 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'battery level: ' . $battery_level . '%', 0);
         $this->WriteAttributeInteger('BATTERY_LEVEL', $battery_level);
         $battery_level_timestamp = $device['attributes']['batteryLevel']['timestamp'];
-        $this->SendDebug('Gardena Device ' . $name, 'battery level timestamp: ' . $battery_level_timestamp, 0);
-        $this->WriteAttributeString('BATTERY_LEVEL_TIMESTAMP', $battery_level_timestamp);
+        $this->WriteAttributeInteger('BATTERY_LEVEL_TIMESTAMP', $this->CalculateTime($battery_level_timestamp, 'Device ' . $name . ' battery level'));
         $battery_state = $device['attributes']['batteryState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'battery state: ' . $battery_state, 0);
         $this->WriteAttributeString('BATTERY_STATE', $battery_state);
         $battery_state_timestamp = $device['attributes']['batteryState']['timestamp'];
-        $this->SendDebug('Gardena Device ' . $name, 'battery state timestamp: ' . $battery_state_timestamp, 0);
-        $this->WriteAttributeString('BATTERY_STATE_TIMESTAMP', $battery_state_timestamp);
+        $this->WriteAttributeInteger('BATTERY_STATE_TIMESTAMP', $this->CalculateTime($battery_state_timestamp, 'Device ' . $name . ' battery state'));
         $rf_link_level = $device['attributes']['rfLinkLevel']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link level: ' . $rf_link_level . '%', 0);
         $this->WriteAttributeInteger('RF_LINK_LEVEL', $rf_link_level);
         $rf_link_level_timestamp = $device['attributes']['rfLinkLevel']['timestamp'];
-        $this->SendDebug('Gardena Device ' . $name, 'RF link level timestamp: ' . $rf_link_level_timestamp, 0);
-        $this->WriteAttributeString('RF_LINK_LEVEL_TIMESTAMP', $rf_link_level_timestamp);
+        $this->WriteAttributeInteger('RF_LINK_LEVEL_TIMESTAMP', $this->CalculateTime($rf_link_level_timestamp, 'Device ' . $name . ' RF link level'));
         $serial = $device['attributes']['serial']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
 
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
@@ -453,7 +481,7 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
 
@@ -463,36 +491,40 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Sensor Humidity', $soil_humidity . ' %', 0);
         $this->WriteAttributeInteger('soil_humidity', $soil_humidity);
         $soil_humidity_timestamp = $device['attributes']['soilHumidity']['timestamp'];
-        $this->SendDebug('Gardena Sensor Humidity Timestamp', $soil_humidity_timestamp, 0);
-        $this->WriteAttributeString('soil_humidity_timestamp', $soil_humidity_timestamp);
+        $this->WriteAttributeInteger('soil_humidity_timestamp', $this->CalculateTime($soil_humidity_timestamp, 'Sensor Humidity'));
         $soil_temperature = $device['attributes']['soilTemperature']['value'];
         $this->SendDebug('Gardena Sensor Temperature', $soil_temperature . ' °C', 0);
         $this->WriteAttributeFloat('soil_temperature', $soil_temperature);
         $soil_temperature_timestamp = $device['attributes']['soilTemperature']['timestamp'];
-        $this->SendDebug('Gardena Sensor Temperature Timestamp', $soil_temperature_timestamp, 0);
-        $this->WriteAttributeString('soil_temperature_timestamp', $soil_temperature_timestamp);
+        $this->WriteAttributeInteger('soil_temperature_timestamp', $this->CalculateTime($soil_temperature_timestamp, 'Sensor Temperature'));
         $ambient_temperature = $device['attributes']['ambientTemperature']['value'];
         $this->SendDebug('Gardena Sensor Ambient Temperature', $ambient_temperature . ' °C', 0);
         $this->WriteAttributeFloat('ambient_temperature', $ambient_temperature);
         $ambient_temperature_timestamp = $device['attributes']['ambientTemperature']['timestamp'];
-        $this->SendDebug('Gardena Sensor Ambient Temperature Timestamp', $ambient_temperature_timestamp, 0);
-        $this->WriteAttributeString('ambient_temperature_timestamp', $ambient_temperature_timestamp);
+        $this->WriteAttributeInteger('ambient_temperature_timestamp', $this->CalculateTime($ambient_temperature_timestamp, 'Sensor Ambient Temperature'));
         $light_intensity = $device['attributes']['lightIntensity']['value'];
         $this->SendDebug('Gardena Sensor Light Intensity', $light_intensity . ' lx', 0);
         $this->WriteAttributeInteger('light_intensity', $light_intensity);
         $light_intensity_timestamp = $device['attributes']['lightIntensity']['timestamp'];
-        $this->SendDebug('Gardena Sensor Light Intensity Timestamp', $light_intensity_timestamp, 0);
-        $this->WriteAttributeString('light_intensity_timestamp', $light_intensity_timestamp);
+        $this->WriteAttributeInteger('light_intensity_timestamp', $this->CalculateTime($light_intensity_timestamp, 'Sensor Light Intensity'));
     }
 
-
-
-
+    private function CalculateTime($time_string, $subject)
+    {
+        $date = new DateTime($time_string);
+        $date->setTimezone(new DateTimeZone('Europe/Berlin'));
+        $timestamp = $date->getTimestamp();
+        $this->SendDebug('Gardena ' . $subject . ' Timestamp', $date->format('Y-m-d H:i:sP'), 0);
+        return $timestamp;
+    }
 
     private function GetDeviceStatus()
     {
         $snapshot = $this->RequestStatus('snapshot');
-        $this->CheckDeviceType($snapshot);
+        if($snapshot != '[]')
+        {
+            $this->CheckDeviceType($snapshot);
+        }
     }
 
     private function CheckDeviceType($snapshot)
@@ -502,6 +534,10 @@ class GardenaDevice extends IPSModule
             $included = $payload['included'];
             foreach ($included as $device) {
                 $type = $device['type'];
+                if($type == 'VALVE')
+                {
+                    $this->GetValveData($device);
+                }
                 if ($type == 'COMMON') {
                     $this->GetDeviceData($device);
                 }
@@ -547,26 +583,28 @@ class GardenaDevice extends IPSModule
         $model_type_instance = $this->ReadPropertyString('model_type');
         if($model_type_instance == self::GARDENA_smart_Irrigation_Control)
         {
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Irrigation_Control, 0);
+            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
         }
 
         if($model_type_instance == self::GARDENA_smart_Sensor)
         {
+            $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
             $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_STRING, true);
-            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
+            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
             $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('ambient_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('light_intensity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_INTEGER);
         }
     }
 
@@ -587,7 +625,10 @@ class GardenaDevice extends IPSModule
 			$data = json_decode($JSONString);
 			$snapshot = $data->Buffer;
             $this->SendDebug('Receive Snapshot', $snapshot, 0);
-            $this->CheckDeviceType($snapshot);
+            if($snapshot != '[]')
+            {
+                $this->CheckDeviceType($snapshot);
+            }
 		}
 
     public function SendCommand(string $service_id, string $data)
