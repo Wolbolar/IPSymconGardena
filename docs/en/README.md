@@ -48,7 +48,7 @@ Then select the module and click _Install_
 
 ![Store](img/install_en.png?raw=true "install")
 
-### b. Somfy Cloud
+### b. Gardena Cloud
 An account with Gardena is required, which is used for the Gardena Smart Gateway.
 
 To get access to the Gardena Smart Gateway via the Gardena API, IP-Symcon must first be authenticated as a system.
@@ -56,7 +56,7 @@ This requires an active IP-Symcon Connect and the normal Gardena user name and p
 First, when installing the module, you are asked whether you want to create a discovery instance, you answer this with _yes_, but you can also create the discovery instance yourself
 
 ### c. Authentication to Gardena (Husqvarna)
-Then a Configure Interface window appears, here you press the _Register_ button and have your Gardena user name and password ready.
+Then a Configure Interface window appears, here you press the _Register_ button and have your Gardena (Husqyarna) user name and password ready.
 
 ![Interface](img/register.png?raw=true "interface")
 
