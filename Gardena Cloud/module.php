@@ -414,7 +414,7 @@ class GardenaCloud extends IPSModule
             $response =  false;
         }
         else{
-            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
+            $this->SendDebug('HTTP Response Header', $http_error . 'Response Body: ' . $result, 0);
             $response =  false;
         }
 
@@ -523,6 +523,7 @@ class GardenaCloud extends IPSModule
      */
     public function GetConfiguration()
     {
+        $snapshot = '[]';
         $location_id = $this->ReadAttributeString('location_id');
         if ($location_id != '') {
             $snapshot = $this->RequestSnapshot();
