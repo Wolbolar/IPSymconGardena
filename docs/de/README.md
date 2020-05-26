@@ -59,7 +59,7 @@ Hierzu wird ein aktives IP-Symcon Connect benötigt und den normalen Gardena Ben
 Zunächst wird beim installieren des Modul gefragt ob eine Konfigurator Instanz angelegt werden soll, dies beantwortet man mit _ja_, man kann aber auch die Konfigurator Instanz von Hand selber anlegen
 
 ### c. Authentifizierung bei Gardena (Husqvarna)
-Anschließend erscheint ein Fenster Schnittstelle konfigurieren, hier drückt man auf den Knopf _Registrieren_ und hält seinen Gardena (Husqyarna) Benutzernamen und Passwort bereit.
+Anschließend erscheint ein Fenster Schnittstelle konfigurieren, hier drückt man auf den Knopf _Registrieren_ und hält seinen Gardena (Husqvarna) Benutzernamen und Passwort bereit.
 
 ![Schnittstelle](img/register.png?raw=true "Schnittstelle")
 
