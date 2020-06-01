@@ -523,11 +523,11 @@ class GardenaDevice extends IPSModule
         $snapshot = $this->RequestStatus('snapshot');
         if($snapshot != '[]')
         {
-            $this->CheckDeviceType($snapshot);
+            $this->CheckDeviceData($snapshot);
         }
     }
 
-    private function CheckDeviceType($snapshot)
+    private function CheckDeviceData($snapshot)
     {
         $payload = json_decode($snapshot, true);
         if (!empty($snapshot)) {
@@ -545,6 +545,7 @@ class GardenaDevice extends IPSModule
                     $this->GetSensorData($device);
                 }
             }
+            $this->WriteValues();
         }
     }
 
@@ -627,7 +628,7 @@ class GardenaDevice extends IPSModule
             $this->SendDebug('Receive Snapshot', $snapshot, 0);
             if($snapshot != '[]')
             {
-                $this->CheckDeviceType($snapshot);
+                $this->CheckDeviceData($snapshot);
             }
 		}
 
