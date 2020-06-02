@@ -108,6 +108,7 @@ class GardenaConfigurator extends IPSModule
      */
     private function GetDeviceType($device)
     {
+        $data = [];
         $model_type = $device['attributes']['modelType']['value'];
         if ($model_type == 'GARDENA smart Irrigation Control') {
             $data = $this->GetIrrigationControlData($device);
@@ -184,35 +185,37 @@ class GardenaConfigurator extends IPSModule
                     $type = $device['type'];
                     if ($type == 'COMMON') {
                         $data = $this->GetDeviceType($device);
-                        $id = $data['id'];
-                        $name = $data['name'];
-                        $serial = $data['serial'];
-                        $rf_link_state = $data['rf_link_state'];
-                        $model_type = $data['model_type'];
-                        foreach ($GardenaInstanceIDList as $GardenaInstanceID) {
-                            if (IPS_GetProperty($GardenaInstanceID, 'id') == $id) {
-                                $instanceID = $GardenaInstanceID;
+                        if(!empty($data))
+                        {
+                            $id = $data['id'];
+                            $name = $data['name'];
+                            $serial = $data['serial'];
+                            $rf_link_state = $data['rf_link_state'];
+                            $model_type = $data['model_type'];
+                            foreach ($GardenaInstanceIDList as $GardenaInstanceID) {
+                                if (IPS_GetProperty($GardenaInstanceID, 'id') == $id) {
+                                    $instanceID = $GardenaInstanceID;
+                                }
                             }
-                        }
-                        $config_list[] = ["instanceID" => $instanceID,
-                            "name" => $name,
-                            "serial" => $serial,
-                            "rf_link_state" => $rf_link_state,
-                            "model_type" => $model_type,
-                            "create" => [
-                                [
-                                    "moduleID" => "{3B073BE1-6556-037C-42FB-6311BC452C68}",
-                                    "configuration" => [
-                                        "id" => $id,
-                                        "name" => $name,
-                                        "serial" => $serial,
-                                        "model_type" => $model_type,
-                                    ],
-                                    "location" => $this->SetLocation()
+                            $config_list[] = ["instanceID" => $instanceID,
+                                "name" => $name,
+                                "serial" => $serial,
+                                "rf_link_state" => $rf_link_state,
+                                "model_type" => $model_type,
+                                "create" => [
+                                    [
+                                        "moduleID" => "{3B073BE1-6556-037C-42FB-6311BC452C68}",
+                                        "configuration" => [
+                                            "id" => $id,
+                                            "name" => $name,
+                                            "serial" => $serial,
+                                            "model_type" => $model_type,
+                                        ],
+                                        "location" => $this->SetLocation()
+                                    ]
                                 ]
-                            ]
-                        ];
-
+                            ];
+                        }
                     }
                 }
             }
