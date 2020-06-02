@@ -147,6 +147,7 @@ class GardenaCloud extends IPSModule
         $this->RegisterAttributeString('location_name', '');
         $this->RegisterAttributeString('snapshot', '[]');
         $this->RegisterPropertyInteger("ImportCategoryID", 0);
+        $this->RegisterAttributeString('websocket_url', '');
 
         //we will wait until the kernel is ready
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -397,6 +398,9 @@ class GardenaCloud extends IPSModule
         if ((strpos($http_error, '200') > 0)) {
             $this->SendDebug('HTTP Response Header',  'Success. Response Body: ' . $result, 0);
         }
+        elseif((strpos($http_error, '201') > 0)) {
+            $this->SendDebug('HTTP Response Header',  'Success. CreatedResponse Body: ' . $result, 0);
+        }
         elseif((strpos($http_error, '401') > 0)) {
             $this->SendDebug('HTTP Response Header', 'Failure, user could not be authenticated. Authorization-Provider or X-Api-Key header or Beaerer Token missing or invalid. Response Body: ' . $result, 0);
             $response =  false;
@@ -413,8 +417,12 @@ class GardenaCloud extends IPSModule
             $this->SendDebug('HTTP Response Header', 'Failure, backend error. Response Body: ' . $result, 0);
             $response =  false;
         }
+        elseif((strpos($http_error, '415') > 0)) {
+            $this->SendDebug('HTTP Response Header', 'Unsupported Media Type. Response Body: ' . $result, 0);
+            $response =  false;
+        }
         else{
-            $this->SendDebug('HTTP Response Header', $http_error . 'Response Body: ' . $result, 0);
+            $this->SendDebug('HTTP Response Header', $http_error . ' Response Body: ' . $result, 0);
             $response =  false;
         }
 
@@ -436,7 +444,7 @@ class GardenaCloud extends IPSModule
     {
         $locationId = $this->ReadAttributeString('location_id');
         $this->SendDebug('Gardena Location ID', $locationId, 0);
-        $websocket_response = '';
+        $response = false;
         if($locationId != '')
         {
             $service_id = 'request-12312'; // todo
@@ -449,6 +457,14 @@ class GardenaCloud extends IPSModule
             ]];
             $data = json_encode($payload);
             $websocket_response = $this->PostData(self::SMART_SYSTEM_BASE_URL . self::WEBSOCKET, $data);
+            $response = true;
+        }
+        if($response)
+        {
+            $websocket_data = json_decode($websocket_response, true);
+            $url = $websocket_data['data']['attributes']['url'];
+            $this->SendDebug('Gardena Websocket URL', $url, 0);
+            $this->WriteAttributeString('websocket_url', $url);
         }
         return $websocket_response;
     }
@@ -553,12 +569,8 @@ class GardenaCloud extends IPSModule
         $context = stream_context_create($opts);
 
         $result = file_get_contents($url, false, $context);
-
-        if ((strpos($http_response_header[0], '200') === false)) {
-            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
-            $this->GetErrorMessage($result);
-            return false;
-        }
+        $http_error = $http_response_header[0];
+        $result = $this->GetErrorMessage($http_error, $result);
         return $result;
     }
 
@@ -566,11 +578,10 @@ class GardenaCloud extends IPSModule
     {
 
         $this->SendDebug("AT", $this->FetchAccessToken(), 0);
-
         $opts = array(
             "http" => array(
                 "method" => "POST",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/json' . "\r\n"
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/vnd.api+json' . "\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
                 'content' => $content,
                 "ignore_errors" => true
@@ -579,12 +590,8 @@ class GardenaCloud extends IPSModule
         $context = stream_context_create($opts);
 
         $result = file_get_contents($url, false, $context);
-
-        if ((strpos($http_response_header[0], '200') === false)) {
-            $this->SendDebug('HTTP Response Header', $http_response_header[0] . 'Response Body: ' . $result, 0);
-            $this->GetErrorMessage($result);
-            return false;
-        }
+        $http_error = $http_response_header[0];
+        $result = $this->GetErrorMessage($http_error, $result);
         return $result;
     }
 
