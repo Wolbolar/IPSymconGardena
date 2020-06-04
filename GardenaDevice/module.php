@@ -12,6 +12,7 @@ class GardenaDevice extends IPSModule
     // helper properties
     private $position = 0;
 
+    private const GARDENA_smart_Water_Control = 'GARDENA smart Water Control';
     private const GARDENA_smart_Irrigation_Control = 'GARDENA smart Irrigation Control';
     private const GARDENA_smart_Sensor = 'GARDENA smart Sensor';
 
@@ -26,6 +27,18 @@ class GardenaDevice extends IPSModule
         $this->RegisterPropertyString('name', '');
         $this->RegisterPropertyString('serial', '');
         $this->RegisterPropertyString('model_type', '');
+        $this->RegisterAttributeString('VALVE_WATERCONTROL_ACTIVITY', '');
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_ACTIVITY_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', 0);
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP_enabled', false);
+        $this->RegisterAttributeString('VALVE_WATERCONTROL_STATE', '');
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_STATE_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_WATERCONTROL_STATE_TIMESTAMP', 0);
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_STATE_TIMESTAMP_enabled', false);
+        $this->RegisterAttributeString('VALVE_WATERCONTROL_ERRORCODE', '');
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_ERRORCODE_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_WATERCONTROL_ERRORCODE_TIMESTAMP', 0);
+        $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_ERRORCODE_TIMESTAMP_enabled', false);
         $this->RegisterAttributeString('VALVE_1_NAME', 'valve 1');
         $this->RegisterAttributeString('VALVE_2_NAME', 'valve 2');
         $this->RegisterAttributeString('VALVE_3_NAME', 'valve 3');
@@ -171,6 +184,51 @@ class GardenaDevice extends IPSModule
             */
         }
 
+        if($model_type == self::GARDENA_smart_Water_Control)
+        {
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_ACTIVITY', $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+            );
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', $this->Translate('activity timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_STATE', $this->Translate('state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+            );
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_STATE_TIMESTAMP', $this->Translate('state timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_ERRORCODE', $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+            );
+            $this->SetupVariable(
+                'VALVE_WATERCONTROL_ERRORCODE_TIMESTAMP', $this->Translate('error code timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'BATTERY_LEVEL', $this->Translate('battery level'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
+            );
+            $this->SetupVariable(
+                'BATTERY_LEVEL_TIMESTAMP', $this->Translate('battery level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'BATTERY_STATE', $this->Translate('battery state'), '~Battery.Reversed', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, true
+            );
+            $this->SetupVariable(
+                'BATTERY_STATE_TIMESTAMP', $this->Translate('battery state timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'RF_LINK_LEVEL', $this->Translate('rf link level'), '~Intensity.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
+            );
+            $this->SetupVariable(
+                'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+        }
+
         if($model_type == self::GARDENA_smart_Sensor)
         {
             $this->SetupVariable(
@@ -181,7 +239,7 @@ class GardenaDevice extends IPSModule
             );
 
             $this->SetupVariable(
-                'BATTERY_STATE', $this->Translate('battery state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                'BATTERY_STATE', $this->Translate('battery state'), '~Battery.Reversed', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, true
             );
             $this->SetupVariable(
                 'BATTERY_STATE_TIMESTAMP', $this->Translate('battery state timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
@@ -408,12 +466,41 @@ class GardenaDevice extends IPSModule
         $name = $device['attributes']['name']['value'];
         $valve_id = explode(':', $device['id']);
         $id = $valve_id[0];
-        $valve_key = $valve_id[1];
+        if(isset($valve_id[1]))
+        {
+            $valve_key = $valve_id[1];
+        }
+        else
+        {
+            $valve_key = 'WATERCONTROL';
+        }
+
         $instance_id = $this->ReadPropertyString('id');
         if($instance_id == $id)
         {
             $this->SendDebug('Gardena Valve ' . $id, $name, 0);
             $this->WriteAttributeString('VALVE_' . $valve_key . '_NAME', $name);
+            if(isset($device['attributes']['activity']['value']))
+            {
+                $activity = $device['attributes']['activity']['value'];
+                $this->WriteAttributeString('VALVE_WATERCONTROL_ACTIVITY', $activity);
+                $activity_timestamp = $device['attributes']['activity']['timestamp'];
+                $this->WriteAttributeInteger('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', $this->CalculateTime($activity_timestamp, 'Device ' . $name . ' activity'));
+            }
+            if(isset($device['attributes']['state']['value']))
+            {
+                $state = $device['attributes']['state']['value'];
+                $this->WriteAttributeString('VALVE_WATERCONTROL_STATE', $state);
+                $state_timestamp = $device['attributes']['state']['timestamp'];
+                $this->WriteAttributeInteger('VALVE_WATERCONTROL_STATE_TIMESTAMP', $this->CalculateTime($state_timestamp, 'Device ' . $name . ' state'));
+            }
+            if(isset($device['attributes']['lastErrorCode']['value']))
+            {
+                $lastErrorCode = $device['attributes']['lastErrorCode']['value'];
+                $this->WriteAttributeString('VALVE_WATERCONTROL_ERRORCODE', $lastErrorCode);
+                $lastErrorCode_timestamp = $device['attributes']['lastErrorCode']['timestamp'];
+                $this->WriteAttributeInteger('VALVE_WATERCONTROL_ERRORCODE_TIMESTAMP', $this->CalculateTime($lastErrorCode_timestamp, 'Device ' . $name . ' last error code'));
+            }
         }
         return $name;
     }
@@ -563,7 +650,21 @@ class GardenaDevice extends IPSModule
         {
             switch ($vartype) {
                 case VARIABLETYPE_BOOLEAN:
-                    $value = $this->ReadAttributeBoolean($ident);
+                    if($ident == 'BATTERY_STATE')
+                    {
+                        $string_value = $this->ReadAttributeString($ident);
+                        if($string_value == 'OK')
+                        {
+                            $value = true;
+                        }
+                        else{
+                            $value = false;
+                        }
+                    }
+                    else
+                    {
+                        $value = $this->ReadAttributeBoolean($ident);
+                    }
                     break;
                 case VARIABLETYPE_INTEGER:
                     $value = $this->ReadAttributeInteger($ident);
@@ -593,7 +694,7 @@ class GardenaDevice extends IPSModule
             $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
             $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_STRING, true);
+            $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_BOOLEAN, true);
             $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);

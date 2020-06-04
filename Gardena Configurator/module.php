@@ -115,6 +115,9 @@ class GardenaConfigurator extends IPSModule
         } elseif ($model_type == 'GARDENA smart Sensor') {
             $data = $this->GetSensorInfo($device);
         }
+        elseif ($model_type == 'GARDENA smart Water Control') {
+            $data = $this->GetWaterControlData($device);
+        }
         return $data;
     }
 
@@ -152,6 +155,22 @@ class GardenaConfigurator extends IPSModule
      * @return array
      */
     private function GetIrrigationControlData($device)
+    {
+        $id = $device['id'];
+        $model_type = $device['attributes']['modelType']['value'];
+        $name = $device['attributes']['name']['value'];
+        $serial = $device['attributes']['serial']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
+        $rf_link_state = $device['attributes']['rfLinkState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
+        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state, 'model_type' => $model_type];
+    }
+
+    /** Get Water Control Data
+     * @param $device
+     * @return array
+     */
+    private function GetWaterControlData($device)
     {
         $id = $device['id'];
         $model_type = $device['attributes']['modelType']['value'];
