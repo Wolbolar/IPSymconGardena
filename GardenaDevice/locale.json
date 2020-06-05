@@ -7,6 +7,8 @@
       "GARDENA smart Sensor": "Gardena Smart Sensor",
       "Update interval in seconds:": "Aktualisierungsinterval in Sekunden",
       "seconds": "Sekunden",
+      "name": "Name",
+      "serial": "Seriennummer",
       "valve 1": "Ventil 1",
       "valve 2": "Ventil 2",
       "valve 3": "Ventil 3",

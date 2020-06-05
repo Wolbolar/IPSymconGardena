@@ -25,8 +25,11 @@ class GardenaDevice extends IPSModule
 
         $this->RegisterPropertyString('id', '');
         $this->RegisterPropertyString('name', '');
+        $this->RegisterAttributeBoolean('name_enabled', false);
         $this->RegisterPropertyString('serial', '');
+        $this->RegisterAttributeBoolean('serial_enabled', false);
         $this->RegisterPropertyString('model_type', '');
+        $this->RegisterAttributeString('VALVE_WATERCONTROL_NAME', '');
         $this->RegisterAttributeString('VALVE_WATERCONTROL_ACTIVITY', '');
         $this->RegisterAttributeBoolean('VALVE_WATERCONTROL_ACTIVITY_enabled', false);
         $this->RegisterAttributeInteger('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', 0);
@@ -99,12 +102,9 @@ class GardenaDevice extends IPSModule
     private function ValidateConfiguration()
     {
         $id = $this->ReadPropertyString('id');
-        if($id == '')
-        {
+        if ($id == '') {
             $this->SetStatus(205);
-        }
-        elseif($id != '')
-        {
+        } elseif ($id != '') {
             $this->RegisterVariables();
             $this->SetStatus(IS_ACTIVE);
         }
@@ -114,12 +114,9 @@ class GardenaDevice extends IPSModule
     {
         $id = $this->ReadPropertyString('id');
         $data = false;
-        if($id == '')
-        {
+        if ($id == '') {
             $this->SetStatus(205);
-        }
-        elseif($id != '')
-        {
+        } elseif ($id != '') {
             $data = $this->RequestStatus('snapshot');
         }
         return $data;
@@ -149,10 +146,20 @@ class GardenaDevice extends IPSModule
 
     private function RegisterVariables(): void
     {
+        $reachable_ass = [
+            [true, $this->Translate("Online"), "", -1],
+            [false, $this->Translate("Offline"), "", -1]];
+        $this->RegisterProfileAssociation('Gardena.Reachable', 'Network', '', '', 0, 1, 0, 0, VARIABLETYPE_BOOLEAN, $reachable_ass);
+
+        $this->SetupVariable(
+            'NAME', $this->Translate('name'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+        );
+        $this->SetupVariable(
+            'SERIAL', $this->Translate('serial'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+        );
         $model_type = $this->ReadPropertyString('model_type');
         $this->GetDeviceStatus();
-        if($model_type == self::GARDENA_smart_Irrigation_Control)
-        {
+        if ($model_type == self::GARDENA_smart_Irrigation_Control) {
             $valve_1_name = $this->ReadAttributeString('VALVE_1_NAME');
             $this->SetupVariable(
                 'VALVE_1_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
@@ -177,15 +184,13 @@ class GardenaDevice extends IPSModule
             $this->SetupVariable(
                 'VALVE_6_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
             );
-            /*
+
             $this->SetupVariable(
-                'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'RF_LINK_STATE', $this->Translate('rf link state'), 'Gardena.Reachable', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
             );
-            */
         }
 
-        if($model_type == self::GARDENA_smart_Water_Control)
-        {
+        if ($model_type == self::GARDENA_smart_Water_Control) {
             $this->SetupVariable(
                 'VALVE_WATERCONTROL_ACTIVITY', $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
             );
@@ -227,10 +232,12 @@ class GardenaDevice extends IPSModule
             $this->SetupVariable(
                 'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
+            $this->SetupVariable(
+                'RF_LINK_STATE', $this->Translate('rf link state'), 'Gardena.Reachable', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
+            );
         }
 
-        if($model_type == self::GARDENA_smart_Sensor)
-        {
+        if ($model_type == self::GARDENA_smart_Sensor) {
             $this->SetupVariable(
                 'BATTERY_LEVEL', $this->Translate('battery level'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
             );
@@ -251,11 +258,9 @@ class GardenaDevice extends IPSModule
             $this->SetupVariable(
                 'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
-            /*
             $this->SetupVariable(
-                'RF_LINK_STATE', $this->Translate('rf link state'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                'RF_LINK_STATE', $this->Translate('rf link state'), 'Gardena.Reachable', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
             );
-            */
 
             $this->SetupVariable(
                 'soil_humidity', $this->Translate('soil humidity'), '~Humidity', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
@@ -285,11 +290,9 @@ class GardenaDevice extends IPSModule
                 'light_intensity_timestamp', $this->Translate('light intensity timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
         }
-        $this->WriteValues();
+        // $this->WriteValues();
 
-        /*
-        $this->RegisterProfile('Gardena.Brightness', 'Intensity', '', ' %', 0, 200, 1, 0, VARIABLETYPE_INTEGER);
-        */
+
     }
 
     /** Variable anlegen / löschen
@@ -309,32 +312,54 @@ class GardenaDevice extends IPSModule
         if ($visible) {
             $this->SendDebug('Gardena Variable:', 'Variable with Ident ' . $ident . ' is visible', 0);
         } else {
+            if ($ident == 'NAME' || $ident == 'SERIAL') {
+                $ident = strtolower($ident);
+            }
             $visible = $this->ReadAttributeBoolean($ident . '_enabled');
-            $this->SendDebug('Gardena Variable:', 'Variable with Ident ' . $ident . ' is shown' . print_r($visible, true), 0);
+            $this->SendDebug('Gardena Variable:', 'Variable with Ident ' . $ident . ' is shown ' . print_r($visible, true), 0);
         }
         if ($visible == true) {
             switch ($vartype) {
                 case VARIABLETYPE_BOOLEAN:
                     $objid = $this->RegisterVariableBoolean($ident, $name, $profile, $position);
-                    $value = $this->ReadAttributeBoolean($ident);
-                    $this->SetValue($ident, $value);
+                    if ($ident == 'BATTERY_STATE') {
+                        $string_value = $this->ReadAttributeString($ident);
+                        if ($string_value == 'OK') {
+                            $value = true;
+                        } else {
+                            $value = false;
+                        }
+                    }elseif($ident == 'RF_LINK_STATE')
+                    {
+                        $string_value = $this->ReadAttributeString($ident);
+                        if ($string_value == 'ONLINE') {
+                            $value = true;
+                        } else {
+                            $value = false;
+                        }
+                    }
+                    else {
+                        $value = $this->ReadAttributeBoolean($ident);
+                    }
                     break;
                 case VARIABLETYPE_INTEGER:
                     $objid = $this->RegisterVariableInteger($ident, $name, $profile, $position);
                     $value = $this->ReadAttributeInteger($ident);
-                    $this->SetValue($ident, $value);
                     break;
                 case VARIABLETYPE_FLOAT:
                     $objid = $this->RegisterVariableFloat($ident, $name, $profile, $position);
                     $value = $this->ReadAttributeFloat($ident);
-                    $this->SetValue($ident, $value);
                     break;
                 case VARIABLETYPE_STRING:
                     $objid = $this->RegisterVariableString($ident, $name, $profile, $position);
-                    $value = $this->ReadAttributeString($ident);
-                    $this->SetValue($ident, $value);
+                    if ($ident == 'name' || $ident == 'serial') {
+                        $value = $this->ReadPropertyString($ident);
+                    } else {
+                        $value = $this->ReadAttributeString($ident);
+                    }
                     break;
             }
+            $this->SetValue($ident, $value);
             if ($enableaction) {
                 $this->EnableAction($ident);
             }
@@ -346,7 +371,6 @@ class GardenaDevice extends IPSModule
         }
         return $objid;
     }
-
 
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -384,18 +408,18 @@ class GardenaDevice extends IPSModule
         // $payload = json_decode($snapshot, true);
         $service_id = '';
         $payload = ['data' => [
-            'id'=> $service_id,
-            'type'=> 'WEBSOCKET',
-            'attributes'=> [
-                'locationId'=> $locationId
+            'id' => $service_id,
+            'type' => 'WEBSOCKET',
+            'attributes' => [
+                'locationId' => $locationId
             ]
         ]];
         $data = json_encode($payload);
         $result = json_decode($this->SendDataToParent(json_encode([
-            'DataID'   => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
+            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
             'Type' => 'POST',
             'Endpoint' => '/websocket',
-            'Payload'  => $data
+            'Payload' => $data
         ])));
         return $result;
     }
@@ -406,11 +430,11 @@ class GardenaDevice extends IPSModule
     public function ControlDevice(string $service_id, string $type, string $command, string $parameter)
     {
         $payload = ['data' => [
-            'id'=> $service_id,
-            'type'=> $type,
-            'attributes'=> [
-                'command'=> $command,
-                'seconds'=> $parameter
+            'id' => $service_id,
+            'type' => $type,
+            'attributes' => [
+                'command' => $command,
+                'seconds' => $parameter
             ]
         ]];
         $data = json_encode($payload);
@@ -419,11 +443,9 @@ class GardenaDevice extends IPSModule
 
     public function ToggleValve(bool $state, int $index)
     {
-        if($state)
-        {
+        if ($state) {
             $this->OpenValve($index);
-        }
-        else{
+        } else {
             $this->StopValve($index);
         }
     }
@@ -434,13 +456,13 @@ class GardenaDevice extends IPSModule
     public function OpenValve(int $index)
     {
         $id = $this->GetValveID($index);
-        $this->ControlDevice($id,'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', "3600");
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', "3600");
     }
 
     public function StopValve(int $index)
     {
         $id = $this->GetValveID($index);
-        $this->ControlDevice($id,'VALVE_CONTROL', 'STOP_UNTIL_NEXT_TASK', "0");
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'STOP_UNTIL_NEXT_TASK', "0");
     }
 
     public function PauseValve(int $index)
@@ -452,7 +474,7 @@ class GardenaDevice extends IPSModule
     public function UnpauseValve(int $index)
     {
         $id = $this->GetValveID($index);
-        $this->ControlDevice($id,'VALVE_CONTROL', 'UNPAUSE', "0");
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'UNPAUSE', "0");
     }
 
     private function GetValveID($index)
@@ -466,36 +488,29 @@ class GardenaDevice extends IPSModule
         $name = $device['attributes']['name']['value'];
         $valve_id = explode(':', $device['id']);
         $id = $valve_id[0];
-        if(isset($valve_id[1]))
-        {
+        if (isset($valve_id[1])) {
             $valve_key = $valve_id[1];
-        }
-        else
-        {
+        } else {
             $valve_key = 'WATERCONTROL';
         }
 
         $instance_id = $this->ReadPropertyString('id');
-        if($instance_id == $id)
-        {
+        if ($instance_id == $id) {
             $this->SendDebug('Gardena Valve ' . $id, $name, 0);
             $this->WriteAttributeString('VALVE_' . $valve_key . '_NAME', $name);
-            if(isset($device['attributes']['activity']['value']))
-            {
+            if (isset($device['attributes']['activity']['value'])) {
                 $activity = $device['attributes']['activity']['value'];
                 $this->WriteAttributeString('VALVE_WATERCONTROL_ACTIVITY', $activity);
                 $activity_timestamp = $device['attributes']['activity']['timestamp'];
                 $this->WriteAttributeInteger('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', $this->CalculateTime($activity_timestamp, 'Device ' . $name . ' activity'));
             }
-            if(isset($device['attributes']['state']['value']))
-            {
+            if (isset($device['attributes']['state']['value'])) {
                 $state = $device['attributes']['state']['value'];
                 $this->WriteAttributeString('VALVE_WATERCONTROL_STATE', $state);
                 $state_timestamp = $device['attributes']['state']['timestamp'];
                 $this->WriteAttributeInteger('VALVE_WATERCONTROL_STATE_TIMESTAMP', $this->CalculateTime($state_timestamp, 'Device ' . $name . ' state'));
             }
-            if(isset($device['attributes']['lastErrorCode']['value']))
-            {
+            if (isset($device['attributes']['lastErrorCode']['value'])) {
                 $lastErrorCode = $device['attributes']['lastErrorCode']['value'];
                 $this->WriteAttributeString('VALVE_WATERCONTROL_ERRORCODE', $lastErrorCode);
                 $lastErrorCode_timestamp = $device['attributes']['lastErrorCode']['timestamp'];
@@ -514,8 +529,7 @@ class GardenaDevice extends IPSModule
         $model_type_instance = $this->ReadPropertyString('model_type');
         $model_type = $device['attributes']['modelType']['value'];
         $id = $device['id'];
-        if($model_type == $model_type_instance && $id == $id_instance)
-        {
+        if ($model_type == $model_type_instance && $id == $id_instance) {
             if ($model_type == 'GARDENA smart Irrigation Control') {
                 $this->GetIrrigationControlData($device);
             } elseif ($model_type == 'GARDENA smart Sensor') {
@@ -551,7 +565,7 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
 
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
@@ -568,7 +582,7 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        // $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
 
@@ -608,8 +622,7 @@ class GardenaDevice extends IPSModule
     private function GetDeviceStatus()
     {
         $snapshot = $this->RequestStatus('snapshot');
-        if($snapshot != '[]')
-        {
+        if ($snapshot != '[]') {
             $this->CheckDeviceData($snapshot);
         }
     }
@@ -621,8 +634,7 @@ class GardenaDevice extends IPSModule
             $included = $payload['included'];
             foreach ($included as $device) {
                 $type = $device['type'];
-                if($type == 'VALVE')
-                {
+                if ($type == 'VALVE') {
                     $this->GetValveData($device);
                 }
                 if ($type == 'COMMON') {
@@ -638,44 +650,54 @@ class GardenaDevice extends IPSModule
 
     private function WriteEnabledValue($ident, $vartype, $enabled = false)
     {
-        if($enabled)
-        {
+        if ($enabled) {
             $value_enabled = true;
-        }
-        else{
+        } else {
             $value_enabled = $this->ReadAttributeBoolean($ident . '_enabled');
         }
 
-        if($value_enabled)
-        {
+        if ($value_enabled) {
             switch ($vartype) {
                 case VARIABLETYPE_BOOLEAN:
-                    if($ident == 'BATTERY_STATE')
-                    {
+                    if ($ident == 'BATTERY_STATE' || $ident == 'RF_LINK_STATE') {
                         $string_value = $this->ReadAttributeString($ident);
-                        if($string_value == 'OK')
-                        {
+                        if ($string_value == 'OK' || $string_value == 'ONLINE') {
                             $value = true;
-                        }
-                        else{
+                            $debug_value = 'true';
+                        } else {
                             $value = false;
+                            $debug_value = 'false';
                         }
                     }
-                    else
-                    {
+                    else {
                         $value = $this->ReadAttributeBoolean($ident);
                     }
+                    $this->SendDebug('SetValue boolean', 'ident: ' . $ident . ' value: ' . $debug_value, 0);
+                    $this->SetVariableValue($ident, $value);
                     break;
                 case VARIABLETYPE_INTEGER:
                     $value = $this->ReadAttributeInteger($ident);
+                    $this->SendDebug('SetValue integer', 'ident: ' . $ident . ' value: ' . $value, 0);
+                    $this->SetVariableValue($ident, $value);
                     break;
                 case VARIABLETYPE_FLOAT:
                     $value = $this->ReadAttributeFloat($ident);
+                    $this->SendDebug('SetValue float', 'ident: ' . $ident . ' value: ' . $value, 0);
+                    $this->SetVariableValue($ident, $value);
                     break;
                 case VARIABLETYPE_STRING:
                     $value = $this->ReadAttributeString($ident);
+                    $this->SendDebug('SetValue string', 'ident: ' . $ident . ' value: ' . $value, 0);
+                    $this->SetVariableValue($ident, $value);
                     break;
             }
+        }
+    }
+
+    private function SetVariableValue($ident, $value)
+    {
+        if(@$this->GetIDForIdent($ident))
+        {
             $this->SetValue($ident, $value);
         }
     }
@@ -683,14 +705,17 @@ class GardenaDevice extends IPSModule
     private function WriteValues()
     {
         $model_type_instance = $this->ReadPropertyString('model_type');
-        if($model_type_instance == self::GARDENA_smart_Irrigation_Control)
-        {
+        if ($model_type_instance == self::GARDENA_smart_Irrigation_Control) {
             $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Irrigation_Control, 0);
-            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
         }
 
-        if($model_type_instance == self::GARDENA_smart_Sensor)
-        {
+        if ($model_type_instance == self::GARDENA_smart_Water_Control) {
+            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Water_Control, 0);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
+        }
+
+        if ($model_type_instance == self::GARDENA_smart_Sensor) {
             $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
             $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
@@ -698,7 +723,7 @@ class GardenaDevice extends IPSModule
             $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
-            // $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_STRING, true);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
             $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
             $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_INTEGER);
             $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
@@ -713,33 +738,32 @@ class GardenaDevice extends IPSModule
     public function RequestStatus(string $endpoint)
     {
         $data = $this->SendDataToParent(json_encode([
-            'DataID'   => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
+            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
             'Type' => 'GET',
             'Endpoint' => $endpoint,
-            'Payload'  => ''
+            'Payload' => ''
         ]));
         $this->SendDebug('Gardena Request Response', $data, 0);
         return $data;
     }
-	
-	public function ReceiveData($JSONString)
-		{
-			$data = json_decode($JSONString);
-			$snapshot = $data->Buffer;
-            $this->SendDebug('Receive Snapshot', $snapshot, 0);
-            if($snapshot != '[]')
-            {
-                $this->CheckDeviceData($snapshot);
-            }
-		}
+
+    public function ReceiveData($JSONString)
+    {
+        $data = json_decode($JSONString);
+        $snapshot = $data->Buffer;
+        $this->SendDebug('Receive Snapshot', $snapshot, 0);
+        if ($snapshot != '[]') {
+            $this->CheckDeviceData($snapshot);
+        }
+    }
 
     public function SendCommand(string $service_id, string $data)
     {
         $result = $this->SendDataToParent(json_encode([
-            'DataID'   => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
+            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
             'Type' => 'PUT',
             'Endpoint' => '/command/' . $service_id,
-            'Payload'  => $data
+            'Payload' => $data
         ]));
         return $result;
     }
@@ -747,11 +771,9 @@ class GardenaDevice extends IPSModule
     public function SetWebFrontVariable(string $ident, bool $value)
     {
         $this->WriteAttributeBoolean($ident, $value);
-        if($value)
-        {
+        if ($value) {
             $this->SendDebug('Gardena Webfront Variable', $ident . ' enabled', 0);
-        }
-        else{
+        } else {
             $this->SendDebug('Gardena Webfront Variable', $ident . ' disabled', 0);
         }
 
@@ -770,10 +792,10 @@ class GardenaDevice extends IPSModule
     {
         // return current form
         return json_encode([
-                               'elements' => $this->FormHead(),
-                               'actions' => $this->FormActions(),
-                               'status' => $this->FormStatus()
-                           ]);
+            'elements' => $this->FormHead(),
+            'actions' => $this->FormActions(),
+            'status' => $this->FormStatus()
+        ]);
     }
 
     /**
@@ -783,8 +805,7 @@ class GardenaDevice extends IPSModule
     protected function FormHead()
     {
         $data = $this->CheckRequest();
-        if($data != false)
-        {
+        if ($data != false) {
             $form = [
                 [
                     'type' => 'Label',
@@ -799,9 +820,7 @@ class GardenaDevice extends IPSModule
                     'label' => $this->Translate('type: ') . $this->Translate($this->ReadPropertyString('model_type'))
                 ]
             ];
-        }
-        else
-        {
+        } else {
             $form = [
                 [
                     'type' => 'Label',
@@ -821,120 +840,137 @@ class GardenaDevice extends IPSModule
 
 
         $model_type = $this->ReadPropertyString('model_type');
-        $form = [];
-        if ($model_type == self::GARDENA_smart_Irrigation_Control) {
-            $form = [
-                [
-                    'name'     => 'VALVE_1_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 1',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_1_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_STATE_enabled", $VALVE_1_STATE_enabled);'],
-                [
-                    'name'     => 'VALVE_2_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 2',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_2_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_STATE_enabled", $VALVE_2_STATE_enabled);'],
-                [
-                    'name'     => 'VALVE_3_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 3',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_3_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_STATE_enabled", $VALVE_3_STATE_enabled);'],
-                [
-                    'name'     => 'VALVE_4_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 4',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_4_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_STATE_enabled", $VALVE_4_STATE_enabled);'],
-                [
-                    'name'     => 'VALVE_5_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 5',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_5_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_STATE_enabled", $VALVE_5_STATE_enabled);'],
-                [
-                    'name'     => 'VALVE_6_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'valve 6',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('VALVE_6_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_STATE_enabled", $VALVE_6_STATE_enabled);'],
-                [
-                    'name'     => 'RF_LINK_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'rf link state',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('RF_LINK_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_STATE_enabled", $RF_LINK_STATE_enabled);']
-            ];
-        } elseif ($model_type == self::GARDENA_smart_Sensor) {
-            $form = [
-                [
-                    'name'     => 'BATTERY_LEVEL_TIMESTAMP_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'battery level timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('BATTERY_LEVEL_TIMESTAMP_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_LEVEL_TIMESTAMP_enabled", $BATTERY_LEVEL_TIMESTAMP_enabled);'],
-                [
-                    'name'     => 'BATTERY_STATE_TIMESTAMP_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'battery state timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('BATTERY_STATE_TIMESTAMP_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_STATE_TIMESTAMP_enabled", $BATTERY_STATE_TIMESTAMP_enabled);'],
-                [
-                    'name'     => 'RF_LINK_STATE_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'rf link state',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('RF_LINK_STATE_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_STATE_enabled", $RF_LINK_STATE_enabled);'],
-                [
-                    'name'     => 'RF_LINK_LEVEL_TIMESTAMP_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'rf link level timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('RF_LINK_LEVEL_TIMESTAMP_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_LEVEL_TIMESTAMP_enabled", $RF_LINK_LEVEL_TIMESTAMP_enabled);'],
-                [
-                    'name'     => 'soil_humidity_timestamp_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'soil humidity timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('soil_humidity_timestamp_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "soil_humidity_timestamp_enabled", $soil_humidity_timestamp_enabled);'],
-                [
-                    'name'     => 'soil_temperature_timestamp_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'soil temperature timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('soil_temperature_timestamp_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "soil_temperature_timestamp_enabled", $soil_temperature_timestamp_enabled);'],
-                [
-                    'name'     => 'ambient_temperature_timestamp_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'ambient temperature timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('ambient_temperature_timestamp_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "ambient_temperature_timestamp_enabled", $ambient_temperature_timestamp_enabled);'],
-                [
-                    'name'     => 'light_intensity_timestamp_enabled',
-                    'type'     => 'CheckBox',
-                    'caption'  => 'light intensity timestamp',
-                    'visible'  => true,
-                    'value'    => $this->ReadAttributeBoolean('light_intensity_timestamp_enabled'),
-                    'onChange' => 'Gardena_SetWebFrontVariable($id, "light_intensity_timestamp_enabled", $light_intensity_timestamp_enabled);']
-            ];
-        }
+        $form = [
+            [
+                'name' => 'name_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'name',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('name_enabled'),
+                'onChange' => 'Gardena_SetWebFrontVariable($id, "name_enabled", $name_enabled);'],
+            [
+                'name' => 'serial_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'serial',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('serial_enabled'),
+                'onChange' => 'Gardena_SetWebFrontVariable($id, "serial_enabled", $serial_enabled);']
+        ];
 
+        if ($model_type == self::GARDENA_smart_Irrigation_Control) {
+            $form = array_merge_recursive(
+                $form, [
+                    [
+                        'name' => 'VALVE_1_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 1',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_1_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                    [
+                        'name' => 'VALVE_2_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 2',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_2_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_STATE_enabled", $VALVE_2_STATE_enabled);'],
+                    [
+                        'name' => 'VALVE_3_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 3',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_3_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_STATE_enabled", $VALVE_3_STATE_enabled);'],
+                    [
+                        'name' => 'VALVE_4_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 4',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_4_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_STATE_enabled", $VALVE_4_STATE_enabled);'],
+                    [
+                        'name' => 'VALVE_5_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 5',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_5_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_STATE_enabled", $VALVE_5_STATE_enabled);'],
+                    [
+                        'name' => 'VALVE_6_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'valve 6',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('VALVE_6_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_STATE_enabled", $VALVE_6_STATE_enabled);'],
+                    [
+                        'name' => 'RF_LINK_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'rf link state',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('RF_LINK_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_STATE_enabled", $RF_LINK_STATE_enabled);']]
+            );
+        } elseif ($model_type == self::GARDENA_smart_Sensor) {
+            $form = array_merge_recursive(
+                $form, [
+                    [
+                        'name' => 'BATTERY_LEVEL_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'battery level timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('BATTERY_LEVEL_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_LEVEL_TIMESTAMP_enabled", $BATTERY_LEVEL_TIMESTAMP_enabled);'],
+                    [
+                        'name' => 'BATTERY_STATE_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'battery state timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('BATTERY_STATE_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_STATE_TIMESTAMP_enabled", $BATTERY_STATE_TIMESTAMP_enabled);'],
+                    [
+                        'name' => 'RF_LINK_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'rf link state',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('RF_LINK_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_STATE_enabled", $RF_LINK_STATE_enabled);'],
+                    [
+                        'name' => 'RF_LINK_LEVEL_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'rf link level timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('RF_LINK_LEVEL_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_LEVEL_TIMESTAMP_enabled", $RF_LINK_LEVEL_TIMESTAMP_enabled);'],
+                    [
+                        'name' => 'soil_humidity_timestamp_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'soil humidity timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('soil_humidity_timestamp_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "soil_humidity_timestamp_enabled", $soil_humidity_timestamp_enabled);'],
+                    [
+                        'name' => 'soil_temperature_timestamp_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'soil temperature timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('soil_temperature_timestamp_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "soil_temperature_timestamp_enabled", $soil_temperature_timestamp_enabled);'],
+                    [
+                        'name' => 'ambient_temperature_timestamp_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'ambient temperature timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('ambient_temperature_timestamp_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "ambient_temperature_timestamp_enabled", $ambient_temperature_timestamp_enabled);'],
+                    [
+                        'name' => 'light_intensity_timestamp_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'light intensity timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('light_intensity_timestamp_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "light_intensity_timestamp_enabled", $light_intensity_timestamp_enabled);']]
+            );
+        }
         return $form;
     }
 
