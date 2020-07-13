@@ -640,7 +640,8 @@ private const STATE_PAUSED = 'PAUSED';
     {
         $extended_debug = $this->ReadAttributeBoolean('extended_debug');
         if($extended_debug){
-            $this->SendDebug('ProcessOAuthData', "Received Raw Data: " . file_get_contents('php://input'), 0);
+            //todo Debug shows no data
+            $this->SendDebug('ProcessOAuthData', "Received Raw Data: " . print_r(file_get_contents('php://input'), true) , 0);
         }
         // <REDIRECT_URI>?code=<AUTHORIZATION_CODE>&state=<STATE>
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
