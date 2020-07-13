@@ -136,6 +136,8 @@ private const STATE_PAUSED = 'PAUSED';
     public function ExtendedDebug(bool $state)
     {
         $this->WriteAttributeBoolean('extended_debug', $state);
+        $debug = $this->ReadAttributeBoolean('extended_debug');
+        return $debug;
     }
 
     private function SetGardenaInterval($gardena_interval): void
@@ -636,27 +638,30 @@ private const STATE_PAUSED = 'PAUSED';
      */
     protected function ProcessOAuthData()
     {
-
+        $extended_debug = $this->ReadAttributeBoolean('extended_debug');
+        if($extended_debug){
+            $this->SendDebug('ProcessOAuthData', "Received Raw Data: " . file_get_contents('php://input'), 0);
+        }
         // <REDIRECT_URI>?code=<AUTHORIZATION_CODE>&state=<STATE>
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             if (!isset($_GET['code'])) {
                 die('Authorization Code expected');
             }
-            $extended_debug = $this->ReadAttributeBoolean('extended_debug');
             if($extended_debug){
                 $this->SendDebug('ProcessOAuthData', "Received Authorization Code: " . $_GET['code'], 0);
             }
 
             $token = $this->FetchRefreshToken($_GET['code']);
+            if($token != false)
+            {
+                $this->SendDebug('ProcessOAuthData', "OK! Let's save the Refresh Token permanently", 0);
 
-            $this->SendDebug('ProcessOAuthData', "OK! Let's save the Refresh Token permanently", 0);
+                $this->WriteAttributeString('Token', $token);
 
-            $this->WriteAttributeString('Token', $token);
-
-            //This will enforce a reload of the property page. change this in the future, when we have more dynamic forms
-            IPS_ApplyChanges($this->InstanceID);
+                //This will enforce a reload of the property page. change this in the future, when we have more dynamic forms
+                IPS_ApplyChanges($this->InstanceID);
+            }
         } else {
-
             //Just print raw post data!
             $payload = file_get_contents('php://input');
             $this->SendDebug('OAuth Response', $payload, 0);
@@ -671,25 +676,45 @@ private const STATE_PAUSED = 'PAUSED';
     private function FetchRefreshToken($code)
     {
         $this->SendDebug('FetchRefreshToken', 'Use Authentication Code to get our precious Refresh Token!', 0);
-        $options = [
-            'http' => [
-                'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
-                'method' => 'POST',
-                'content' => http_build_query(['code' => $code])]];
-        $context = stream_context_create($options);
-        $result = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+        $result = false;
+        set_error_handler(
+            function ($severity, $message, $file, $line) {
+                throw new ErrorException($message, $severity, $severity, $file, $line);
+            }
+        );
 
-        $data = json_decode($result);
-        $this->SendDebug('Symcon Connect Data', $result, 0);
-        if (!isset($data->token_type) || $data->token_type != 'Bearer') {
-            die('Bearer Token expected');
+        try {
+            $options = [
+                'http' => [
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'POST',
+                    'content' => http_build_query(['code' => $code])]];
+            $context = stream_context_create($options);
+            $result = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+        }
+        catch (Exception $e) {
+            $this->SendDebug('Error', $e->getMessage(), 0);
         }
 
-        //Save temporary access token
-        $this->FetchAccessToken($data->access_token, time() + $data->expires_in);
+        restore_error_handler();
 
-        //Return RefreshToken
-        return $data->refresh_token;
+        if($result != false)
+        {
+            $data = json_decode($result);
+            $this->SendDebug('Symcon Connect Data', $result, 0);
+            if (!isset($data->token_type) || $data->token_type != 'Bearer') {
+                die('Bearer Token expected');
+            }
+
+            //Save temporary access token
+            $this->FetchAccessToken($data->access_token, time() + $data->expires_in);
+
+            //Return RefreshToken
+            return $data->refresh_token;
+        }
+        else{
+            return false;
+        }
     }
 
     /***********************************************************
