@@ -6,7 +6,11 @@
       "Update interval in minutes (minimum 15 minutes):": "Aktualisierungsinterval in Minuten (minimum 15 Minuten):",
       "seconds": "Sekunden",
       "minutes": "Minuten",
+      "Gardena username and password:": "Gardena Benutzername und Passwort:",
+      "Gardena username:": "Gardena Benutzername:",
+      "Gardena password:": "Gardena Passwort:",
       "Gardena Location: ": "Gardena Standort: ",
+      "alternative API active": "alternative API aktiv",
       "Status: Symcon Connect is OK!": "Status: Symcon Connect ist OK!",
       "Error: Symcon Connect is not active!": "Error: Symcon Connect is nicht aktiv!",
       "category for Gardena devices": "Kategorie für Gardena Geräte",
@@ -21,7 +25,7 @@
       "Please follow the instructions.": "Bitte der Anleitung folgen",
       "no category selected.": "Keine Kategorie ausgewählt",
       "choose category for import.": "Kategorie zum Import auswählen.",
-      "configuration valid.": "Konfigurator ist ok."
+      "configuration valid.": "Konfiguration ist ok."
     }
   }
 }

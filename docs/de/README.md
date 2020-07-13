@@ -21,7 +21,7 @@ Steuerung von Gardena Geräten über die Gardena API.
 ## 2. Voraussetzungen
 
  - IPS 5.2
- - Gardena Benutzername and Gardena Smart Gateway
+ - Gardena Benutzername und Gardena Smart Gateway
  - IP-Symcon Connect
 
 ## 3. Installation
@@ -58,19 +58,19 @@ Um Zugriff auf das Gardena Smart Gateway über die Gardena API zu erhalten muss 
 Hierzu wird ein aktives IP-Symcon Connect benötigt und den normalen Gardena Benutzernamen und Passwort.
 Zunächst wird beim installieren des Modul gefragt ob eine Konfigurator Instanz angelegt werden soll, dies beantwortet man mit _ja_, man kann aber auch die Konfigurator Instanz von Hand selber anlegen
 
-### c. Authentifizierung bei Gardena (Husqvarna)
+### c. Authentifizierung bei Gardena
 Anschließend erscheint ein Fenster Schnittstelle konfigurieren, hier drückt man auf den Knopf _Registrieren_ und hält seinen Gardena (Husqvarna) Benutzernamen und Passwort bereit.
 
 ![Schnittstelle](img/register.png?raw=true "Schnittstelle")
 
-Es öffnet sich die Anmeldeseite von Gardena (Husqvarna). Hier gibt man in die Maske den  Benutzernamen und das Gardena Passwort an und fährt mit einem Klick auf _Anmelden_ fort.
+Es öffnet sich die Anmeldeseite von Gardena. Hier gibt man in die Maske den  Benutzernamen und das Gardena Passwort an und fährt mit einem Klick auf _Anmelden_ fort.
 
-![Anmeldung](img/oauth_0.png?raw=true "Anmeldung")
+![Anmeldung](img/gardena_oauth_1.png?raw=true "Anmeldung")
 
 Jetzt wird man von Gardena gefragt ob IP-Symcon als System die persönlichen Geräte auslesen darf, die Gardena Geräte steuern sowie den Status der Geräte auslesen darf.
 HIer muss man nun mit _Ja_ bestätigen um IP-Symcon zu erlauben das Gardena Smart Gateway zu steuern und damit auch die Gardena Geräte steuern zu können.
 
-![Genehmigung](img/oauth_1.png?raw=true "Genehmigung")
+![Genehmigung](img/gardena_oauth_2.png?raw=true "Genehmigung")
 
 Es erscheint dann eine Bestätigung durch IP-Symcon das die Authentifizierung erfolgreich war,
  
@@ -85,7 +85,7 @@ Nun öffnen wir die Konfigurator Instanz im Objekt Baum zu finden unter _Konfigu
 
 Jetzt wechseln wir im Objektbaum in die Instanz _**Gardena**_ (Typ Gardena Configurator) zu finden unter _Konfigurator Instanzen_.
 
-![config](img/config.png?raw=true "config")
+![config](img/gardena_konfigurator.png?raw=true "config")
 
 Hier werden alle Geräte, die bei Gardena unter dem Account registiert sind und von der Gardena API unterstützt werden aufgeführt.
 

@@ -22,7 +22,7 @@ Control Gardena devices via Gardena Cloud API.
 ## 2. Requirements
 
  - IPS 5.2
- - Gardena username und Gardena Smart Gateway
+ - Gardena username and Gardena Smart Gateway
  - IP-Symcon Connect
 
 ## 3. Installation
@@ -55,19 +55,19 @@ To get access to the Gardena Smart Gateway via the Gardena API, IP-Symcon must f
 This requires an active IP-Symcon Connect and the normal Gardena user name and password.
 First, when installing the module, you are asked whether you want to create a discovery instance, you answer this with _yes_, but you can also create the discovery instance yourself
 
-### c. Authentication to Gardena (Husqvarna)
+### c. Authentication to Gardena
 Then a Configure Interface window appears, here you press the _Register_ button and have your Gardena (Husqvarna) user name and password ready.
 
 ![Interface](img/register.png?raw=true "interface")
 
 Gardena's login page opens. Here you enter the Gardena user name and the Gardena password in the mask and continue by clicking on _Login_.
 
-![Login](img/oauth_0.png?raw=true "Login")
+![Login](img/gardena_oauth_1_en.png?raw=true "Login")
 
 Gardena now asks if IP-Symcon as a system can read out personal devices, control Gardena devices and read out the status of the devices.
 Here you have to confirm with _Yes_ to allow IP-Symcon to control the Gardena Smart Gateway and thus also to control the Gardena devices.
 
-![Approval](img/oauth_1.png?raw=true "approval")
+![Approval](img/gardena_oauth_2_en.png?raw=true "approval")
 
 A confirmation by IP-Symcon appears that the authentication was successful,
  
@@ -83,7 +83,7 @@ Now we open the configurator instance in the object tree under _configurator ins
 
 Now we switch to the instance _**gardena**_ (type Gardena Configurator) in the object tree under _Configurator Instances_.
 
-![config](img/config.png?raw=true "config")
+![config](img/gardena_configurator.png?raw=true "config")
 
 All devices that are registered with Gardena under the account and supported by the Gardena API are listed here.
 
