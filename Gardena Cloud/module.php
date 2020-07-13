@@ -60,10 +60,9 @@ private const STATE_PAUSED = 'PAUSED';
         $this->RegisterAttributeBoolean('alternative_url', false);
         $this->RegisterAttributeBoolean('limit', false);
         $this->RegisterAttributeString('user_id', '');
-        $this->RegisterAttributeString('token_2', '');
-        $this->RegisterAttributeString('refresh_token_2', '');
         $this->RegisterAttributeString('locations', '');
         $this->RegisterAttributeString('devices', '[]');
+        $this->RegisterAttributeBoolean('extended_debug', false);
 
         //we will wait until the kernel is ready
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -132,6 +131,11 @@ private const STATE_PAUSED = 'PAUSED';
             IPS_SetProperty($ids[0], 'ClientIDs', json_encode($clientIDs));
             IPS_ApplyChanges($ids[0]);
         }
+    }
+
+    public function ExtendedDebug(bool $state)
+    {
+        $this->WriteAttributeBoolean('extended_debug', $state);
     }
 
     private function SetGardenaInterval($gardena_interval): void
@@ -637,6 +641,10 @@ private const STATE_PAUSED = 'PAUSED';
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             if (!isset($_GET['code'])) {
                 die('Authorization Code expected');
+            }
+            $extended_debug = $this->ReadAttributeBoolean('extended_debug');
+            if($extended_debug){
+                $this->SendDebug('ProcessOAuthData', "Received Authorization Code: " . $_GET['code'], 0);
             }
 
             $token = $this->FetchRefreshToken($_GET['code']);
