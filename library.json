@@ -4,9 +4,9 @@
     "name": "Gardena",
     "url": "https://github.com/Wolbolar/IPSymconGardena",
     "compatibility": {
-        "version": "5.0"
+        "version": "5.5"
     },
-    "version": "0.5",
-    "build": 2,
+    "version": "0.6",
+    "build": 1,
     "date": 0
 }

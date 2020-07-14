@@ -1,17 +1,17 @@
 {
     "id": "{9775D7CA-5667-8554-0172-2EBB2F553A54}",
     "name": "Gardena Cloud",
-    "type": 1,
+    "type": 2,
     "vendor": "Gardena",
     "aliases": [
         "Gardena Cloud"
     ],
-    "parentRequirements": [],
+    "parentRequirements": ["{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"],
     "childRequirements": [
         "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}"
     ],
     "implemented": [
-        "{0FE98840-1BBA-4E87-897D-30506FEF540A}", "{3F1DBEA8-38D6-12F4-A487-AF43F6326060}"
+        "{018EF6B5-AB94-40C6-AA53-46943E824ACF}","{0FE98840-1BBA-4E87-897D-30506FEF540A}", "{3F1DBEA8-38D6-12F4-A487-AF43F6326060}"
     ],
     "prefix": "GARDENA",
     "url": "https://github.com/Wolbolar/IPSymconGardena"

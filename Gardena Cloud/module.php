@@ -64,6 +64,8 @@ private const STATE_PAUSED = 'PAUSED';
         $this->RegisterAttributeString('devices', '[]');
         $this->RegisterAttributeBoolean('extended_debug', false);
 
+        $this->RequireParent("{D68FD31F-0E90-7019-F16C-1949BD3079EF}"); // Websocket I/O
+
         //we will wait until the kernel is ready
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
@@ -332,6 +334,10 @@ private const STATE_PAUSED = 'PAUSED';
             $url = $websocket_data['data']['attributes']['url'];
             $this->SendDebug('Gardena Websocket URL', $url, 0);
             $this->WriteAttributeString('websocket_url', $url);
+            $parent = $ParentID = @IPS_GetInstance($this->InstanceID)['ConnectionID'];
+            IPS_SetProperty($parent, 'URL', $url);
+            IPS_SetProperty($parent, 'Active', true);
+            IPS_ApplyChanges($parent);
         }
         return $websocket_response;
     }
@@ -535,7 +541,10 @@ private const STATE_PAUSED = 'PAUSED';
             [
                 'name' => 'UpdateInterval',
                 'visible' => true,
-                'type' => 'IntervalBox',
+                'type' => 'NumberSpinner',
+                'suffix' => 'minutes',
+                'minimum' => 15,
+                'enabled' => true,
                 'caption' => 'minutes'
             ]
         ];
