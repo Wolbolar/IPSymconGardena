@@ -31,7 +31,13 @@
       "light intensity": "Licht Intensität",
       "light intensity timestamp": "Licht Intensität Letzte Übertragung",
       "Gardena device created.": "Gardena Gerät erstellt.",
-      "This device can only created by the Gardena configurator, please use the Gardena configurator for creating Gardena devices.": "Dieses Gerät kann nur durch einen Gardena Konfiguartor erzeugt werden und nicht manuell, bitte benutzten Sie den Gardena Konfigurator zum anlegen von einem neuen Gerät."
+      "This device can only created by the Gardena configurator, please use the Gardena configurator for creating Gardena devices.": "Dieses Gerät kann nur durch einen Gardena Konfiguartor erzeugt werden und nicht manuell, bitte benutzten Sie den Gardena Konfigurator zum anlegen von einem neuen Gerät.",
+      "activity": "Aktivität",
+      "activity timestamp":"Aktivität Letzte Übertragung",
+      "state": "Status",
+      "state timestamp": "Status Letzte Übertragung",
+      "error code": "Fehlercode",
+      "error code timestamp": "Fehlercode Letzte Übertragung"
     }
   }
 }
