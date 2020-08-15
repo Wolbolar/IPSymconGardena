@@ -343,6 +343,16 @@ class GardenaCloud extends IPSModule
         return $websocket_response;
     }
 
+    public function ReceiveData($JSONString)
+    {
+        $data = json_decode($JSONString);
+        $payload = $data->Buffer;
+        $this->SendDebug('Receive Gardena Websocket Payload', $payload, 0);
+        if ($payload != '[]') {
+            $this->SendDataToChildren(json_encode(array("DataID" => "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}", "Buffer" => $payload)));
+        }
+    }
+
     private function PostData($url, $content)
     {
 
