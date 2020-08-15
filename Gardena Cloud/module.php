@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 class GardenaCloud extends IPSModule
 {
-    private const SMART_SYSTEM_BASE_URL = 'https://api.smart.gardena.dev/v1';
+    private const SMART_SYSTEM_BASE_URL = 'https://oauth.symcon.cloud/proxy/gardena/v1';
 
     // GARDENA smart system API
     private const AUTOMOVER_CONNECT_SYSTEM_BASE_URL = 'https://api.amc.husqvarna.dev/v1';
     private const LOCATIONS = '/locations';
     private const WEBSOCKET = '/websocket';
-    private const APIKEY = 'b42b22bf-5482-4f0b-b78a-9c5558ff5b4a';
-private const MAIN_AREA = 'MAIN_AREA';
+    private const MAIN_AREA = 'MAIN_AREA';
     // mover mode
     private const DEMO = 'DEMO'; // Mower will mow until low battery. Go home and charge. Leave and continue mowing. Week schedule is used. Schedule can be overridden with forced park or forced mowing.
     private const SECONDARY_AREA = 'SECONDARY_AREA'; // Same as main area, but shorter times. No blade operation.
@@ -27,8 +26,8 @@ private const MAIN_AREA = 'MAIN_AREA';
     private const STOPPED_IN_GARDEN = 'STOPPED_IN_GARDEN'; // Mower is parked in charging station.
     private const STATE_UNKNOWN = 'UNKNOWN'; // Mower has stopped. Needs manual action to resume.
     // mover state
-        private const STATE_NOT_APPLICABLE = 'NOT_APPLICABLE'; // Unknown state.
-private const STATE_PAUSED = 'PAUSED';
+    private const STATE_NOT_APPLICABLE = 'NOT_APPLICABLE'; // Unknown state.
+    private const STATE_PAUSED = 'PAUSED';
     private const STATE_IN_OPERATION = 'IN_OPERATION'; // Mower has been paused by user.
     private const STATE_WAIT_UPDATING = 'WAIT_UPDATING'; // See value in activity for status.
     private const STATE_WAIT_POWER_UP = 'WAIT_POWER_UP'; // Mower is downloading new firmware.
@@ -189,7 +188,7 @@ private const STATE_PAUSED = 'PAUSED';
         $opts = array(
             "http" => array(
                 "method" => "GET",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n",
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\n",
                 "ignore_errors" => true
             )
         );
@@ -316,6 +315,7 @@ private const STATE_PAUSED = 'PAUSED';
         $locationId = $this->ReadAttributeString('location_id');
         $this->SendDebug('Gardena Location ID', $locationId, 0);
         $response = false;
+        $websocket_response = "";
         if ($locationId != '') {
             $service_id = 'request-12312'; // todo
             $payload = ['data' => [
@@ -325,6 +325,7 @@ private const STATE_PAUSED = 'PAUSED';
                     'locationId' => $locationId
                 ]
             ]];
+
             $data = json_encode($payload);
             $websocket_response = $this->PostData(self::SMART_SYSTEM_BASE_URL . self::WEBSOCKET, $data);
             $response = true;
@@ -349,7 +350,7 @@ private const STATE_PAUSED = 'PAUSED';
         $opts = array(
             "http" => array(
                 "method" => "POST",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/vnd.api+json' . "\r\n"
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\n" . 'Content-Type: application/vnd.api+json' . "\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
                 'content' => $content,
                 "ignore_errors" => true
@@ -446,7 +447,7 @@ private const STATE_PAUSED = 'PAUSED';
         $opts = array(
             "http" => array(
                 "method" => "PUT",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/json' . "\r\n"
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nContent-Type: application/json\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
                 'content' => $content,
                 "ignore_errors" => true
@@ -651,6 +652,7 @@ private const STATE_PAUSED = 'PAUSED';
         if($extended_debug){
             //todo Debug shows no data
             $this->SendDebug('ProcessOAuthData', "Received Raw Data: " . print_r(file_get_contents('php://input'), true) , 0);
+            $this->SendDebug('ProcessOAuthData', "Received GET Data: " . json_encode($_GET) , 0);
         }
         // <REDIRECT_URI>?code=<AUTHORIZATION_CODE>&state=<STATE>
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
