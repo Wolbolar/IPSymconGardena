@@ -15,6 +15,7 @@ class GardenaDevice extends IPSModule
     private const GARDENA_smart_Water_Control = 'GARDENA smart Water Control';
     private const GARDENA_smart_Irrigation_Control = 'GARDENA smart Irrigation Control';
     private const GARDENA_smart_Sensor = 'GARDENA smart Sensor';
+    private const GARDENA_smart_Mower = 'GARDENA smart Mower';
     private const PICTURE_LOGO_GARDENA = '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';
 
     public function Create()
@@ -469,6 +470,33 @@ class GardenaDevice extends IPSModule
                 'light_intensity_timestamp', $this->Translate('light intensity timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
             );
         }
+
+        if ($model_type == self::GARDENA_smart_Mower) {
+            $this->SetupVariable(
+                'BATTERY_LEVEL', $this->Translate('battery level'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
+            );
+            $this->SetupVariable(
+                'BATTERY_LEVEL_TIMESTAMP', $this->Translate('battery level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'BATTERY_STATE', $this->Translate('battery state'), '~Battery.Reversed', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, true
+            );
+            $this->SetupVariable(
+                'BATTERY_STATE_TIMESTAMP', $this->Translate('battery state timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+
+            $this->SetupVariable(
+                'RF_LINK_LEVEL', $this->Translate('rf link level'), '~Intensity.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
+            );
+            $this->SetupVariable(
+                'RF_LINK_LEVEL_TIMESTAMP', $this->Translate('rf link level timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+            );
+            $this->SetupVariable(
+                'RF_LINK_STATE', $this->Translate('rf link state'), 'Gardena.Reachable', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
+            );
+            // TODO add Mover variables
+        }
         // $this->WriteValues();
 
 
@@ -758,10 +786,13 @@ class GardenaDevice extends IPSModule
         $model_type = $device['attributes']['modelType']['value'];
         $id = $device['id'];
         if ($model_type == $model_type_instance && $id == $id_instance) {
-            if ($model_type == 'GARDENA smart Irrigation Control') {
+            if ($model_type == self::GARDENA_smart_Irrigation_Control) {
                 $this->GetIrrigationControlData($device);
-            } elseif ($model_type == 'GARDENA smart Sensor') {
+            } elseif ($model_type == self::GARDENA_smart_Sensor) {
                 $this->GetSensorInfo($device);
+            }
+            elseif ($model_type == self::GARDENA_smart_Mower) {
+                $this->GetMoverData($device);
             }
         }
     }
@@ -806,6 +837,37 @@ class GardenaDevice extends IPSModule
     {
         $id = $device['id'];
         $name = $device['attributes']['name']['value'];
+        $serial = $device['attributes']['serial']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
+        $rf_link_state = $device['attributes']['rfLinkState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
+        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
+    }
+
+    /** Get Mover Data
+     * @param $device
+     * @return array
+     */
+    private function GetMoverData($device)
+    {
+        $id = $device['id'];
+        $name = $device['attributes']['name']['value'];
+        $battery_level = $device['attributes']['batteryLevel']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery level: ' . $battery_level . '%', 0);
+        $this->WriteAttributeInteger('BATTERY_LEVEL', $battery_level);
+        $battery_level_timestamp = $device['attributes']['batteryLevel']['timestamp'];
+        $this->WriteAttributeInteger('BATTERY_LEVEL_TIMESTAMP', $this->CalculateTime($battery_level_timestamp, 'Device ' . $name . ' battery level'));
+        $battery_state = $device['attributes']['batteryState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'battery state: ' . $battery_state, 0);
+        $this->WriteAttributeString('BATTERY_STATE', $battery_state);
+        $battery_state_timestamp = $device['attributes']['batteryState']['timestamp'];
+        $this->WriteAttributeInteger('BATTERY_STATE_TIMESTAMP', $this->CalculateTime($battery_state_timestamp, 'Device ' . $name . ' battery state'));
+        $rf_link_level = $device['attributes']['rfLinkLevel']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link level: ' . $rf_link_level . '%', 0);
+        $this->WriteAttributeInteger('RF_LINK_LEVEL', $rf_link_level);
+        $rf_link_level_timestamp = $device['attributes']['rfLinkLevel']['timestamp'];
+        $this->WriteAttributeInteger('RF_LINK_LEVEL_TIMESTAMP', $this->CalculateTime($rf_link_level_timestamp, 'Device ' . $name . ' RF link level'));
         $serial = $device['attributes']['serial']['value'];
         $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
         $rf_link_state = $device['attributes']['rfLinkState']['value'];
@@ -1106,8 +1168,6 @@ class GardenaDevice extends IPSModule
      */
     protected function FormActions()
     {
-
-
         $model_type = $this->ReadPropertyString('model_type');
         $form = [
             [
@@ -1238,6 +1298,39 @@ class GardenaDevice extends IPSModule
                         'visible' => true,
                         'value' => $this->ReadAttributeBoolean('light_intensity_timestamp_enabled'),
                         'onChange' => 'Gardena_SetWebFrontVariable($id, "light_intensity_timestamp_enabled", $light_intensity_timestamp_enabled);']]
+            );
+        }
+        elseif ($model_type == self::GARDENA_smart_Mower) {
+            $form = array_merge_recursive(
+                $form, [
+                    [
+                        'name' => 'BATTERY_LEVEL_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'battery level timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('BATTERY_LEVEL_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_LEVEL_TIMESTAMP_enabled", $BATTERY_LEVEL_TIMESTAMP_enabled);'],
+                    [
+                        'name' => 'BATTERY_STATE_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'battery state timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('BATTERY_STATE_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "BATTERY_STATE_TIMESTAMP_enabled", $BATTERY_STATE_TIMESTAMP_enabled);'],
+                    [
+                        'name' => 'RF_LINK_STATE_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'rf link state',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('RF_LINK_STATE_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_STATE_enabled", $RF_LINK_STATE_enabled);'],
+                    [
+                        'name' => 'RF_LINK_LEVEL_TIMESTAMP_enabled',
+                        'type' => 'CheckBox',
+                        'caption' => 'rf link level timestamp',
+                        'visible' => true,
+                        'value' => $this->ReadAttributeBoolean('RF_LINK_LEVEL_TIMESTAMP_enabled'),
+                        'onChange' => 'Gardena_SetWebFrontVariable($id, "RF_LINK_LEVEL_TIMESTAMP_enabled", $RF_LINK_LEVEL_TIMESTAMP_enabled);']]
             );
         }
         return $form;
