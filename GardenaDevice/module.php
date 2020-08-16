@@ -246,7 +246,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_1_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_1_ERRORCODE', $valve_1_name .$this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_1_ERRORCODE', $valve_1_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -255,7 +255,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_1_ACTIVITY_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_1_ERRORCODE', $valve_1_name .$this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_1_ERRORCODE', $valve_1_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
             $valve_2_name = $this->ReadAttributeString('VALVE_2_NAME');
@@ -267,7 +267,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_2_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_2_ERRORCODE', $valve_2_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_2_ERRORCODE', $valve_2_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -276,7 +276,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_2_ACTIVITY_STATE', $this->Translate($valve_2_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_2_ERRORCODE', $valve_2_name .$this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_2_ERRORCODE', $valve_2_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
             $valve_3_name = $this->ReadAttributeString('VALVE_3_NAME');
@@ -288,7 +288,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_3_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_3_ERRORCODE', $valve_3_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_3_ERRORCODE', $valve_3_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -297,7 +297,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_3_ACTIVITY_STATE', $this->Translate($valve_3_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_3_ERRORCODE', $valve_3_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_3_ERRORCODE', $valve_3_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
             $valve_4_name = $this->ReadAttributeString('VALVE_4_NAME');
@@ -309,7 +309,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_4_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_4_ERRORCODE', $valve_4_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_4_ERRORCODE', $valve_4_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -318,7 +318,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_4_ACTIVITY_STATE', $this->Translate($valve_4_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_4_ERRORCODE', $valve_4_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_4_ERRORCODE', $valve_4_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
             $valve_5_name = $this->ReadAttributeString('VALVE_5_NAME');
@@ -330,7 +330,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_5_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_5_ERRORCODE', $valve_5_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_5_ERRORCODE', $valve_5_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -339,7 +339,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_5_ACTIVITY_STATE', $this->Translate($valve_5_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_5_ERRORCODE', $valve_5_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_5_ERRORCODE', $valve_5_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
             $valve_6_name = $this->ReadAttributeString('VALVE_6_NAME');
@@ -351,7 +351,7 @@ class GardenaDevice extends IPSModule
                 );
                 $this->WriteAttributeBoolean('VALVE_6_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_6_ERRORCODE', $valve_6_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_6_ERRORCODE', $valve_6_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
                 );
             }
             else
@@ -360,7 +360,7 @@ class GardenaDevice extends IPSModule
                     'VALVE_6_ACTIVITY_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->SetupVariable(
-                    'VALVE_6_ERRORCODE', $valve_6_name . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                    'VALVE_6_ERRORCODE', $valve_6_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
 
@@ -917,6 +917,7 @@ class GardenaDevice extends IPSModule
                     }
                     else {
                         $value = $this->ReadAttributeBoolean($ident);
+                        $debug_value = strval($value);
                     }
                     $this->SendDebug('SetValue boolean', 'ident: ' . $ident . ' value: ' . $debug_value, 0);
                     $this->SetVariableValue($ident, $value);
