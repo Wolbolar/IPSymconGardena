@@ -669,6 +669,15 @@ class GardenaDevice extends IPSModule
         $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', $this->GetWateringInterval());
     }
 
+    /** START for Interval
+     * manual operation, use 'seconds' attribute to define
+     */
+    public function OpenValveForPeriod(int $index, int $seconds)
+    {
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', strval($seconds));
+    }
+    
     private function GetWateringInterval()
     {
         // TODO add interval slider
