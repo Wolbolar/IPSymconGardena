@@ -97,6 +97,8 @@ class GardenaDevice extends IPSModule
         if (IPS_GetKernelRunlevel() !== KR_READY) {
             return;
         }
+        $id = $this->ReadPropertyString('id');
+        $this->SetReceiveDataFilter(".*" . $id . ".*");
         $this->ValidateConfiguration();
     }
 

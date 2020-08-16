@@ -49,7 +49,9 @@ class GardenaCloud extends IPSModule
         $this->RegisterPropertyString("user", '');
         $this->RegisterPropertyString("password", '');
         $this->RegisterPropertyInteger("UpdateInterval", 15);
+        $this->RegisterPropertyInteger("WebsocketUpdateInterval", 60);
         $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
+        $this->RegisterTimer("UpdateWebsocket", 0, "GARDENA_UpdateWebsocket(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
         $this->RegisterAttributeString('location_id', '');
         $this->RegisterAttributeString('location_name', '');
@@ -103,6 +105,8 @@ class GardenaCloud extends IPSModule
         $this->RegisterOAuth($this->oauthIdentifer);
         $gardena_interval = $this->ReadPropertyInteger('UpdateInterval');
         $this->SetGardenaInterval($gardena_interval);
+        $gardena_websocket_interval = $this->ReadPropertyInteger('WebsocketUpdateInterval');
+        $this->SetGardenaWebsocketInterval($gardena_websocket_interval);
 
         if ($this->ReadAttributeString('Token') == '') {
             $this->SetStatus(IS_INACTIVE);
@@ -150,6 +154,12 @@ class GardenaCloud extends IPSModule
         $this->SetTimerInterval('Update', $interval);
     }
 
+    private function SetGardenaWebsocketInterval($gardena_websocket_interval): void
+    {
+        $interval = $gardena_websocket_interval * 1000 ; // seconds
+        $this->SetTimerInterval('UpdateWebsocket', $interval);
+    }
+
     public function Update()
     {
         $snapshot = $this->RequestSnapshot();
@@ -157,6 +167,13 @@ class GardenaCloud extends IPSModule
         $this->SendDebug('Send Snapshot', $snapshot, 0);
         $this->SendDataToChildren(json_encode(array("DataID" => "{E95D48A0-6A3D-3F4E-B73E-7645BBFC6A06}", "Buffer" => $snapshot)));
         return $snapshot;
+    }
+
+    public function UpdateWebsocket()
+    {
+        $websocket_response = $this->GetWebSocket();
+        $this->SendDebug('Refresh Websocket', json_encode($websocket_response), 0);
+        return $websocket_response;
     }
 
     /** Get location with its devices and services (a device can have multiple services).
