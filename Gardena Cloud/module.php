@@ -49,7 +49,7 @@ class GardenaCloud extends IPSModule
         $this->RegisterPropertyString("user", '');
         $this->RegisterPropertyString("password", '');
         $this->RegisterPropertyInteger("UpdateInterval", 15);
-        $this->RegisterPropertyInteger("WebsocketUpdateInterval", 60);
+        $this->RegisterPropertyInteger("WebsocketUpdateInterval", 150);
         $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
         $this->RegisterTimer("UpdateWebsocket", 0, "GARDENA_UpdateWebsocket(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
@@ -154,6 +154,10 @@ class GardenaCloud extends IPSModule
         $this->SetTimerInterval('Update', $interval);
     }
 
+    /** Refresh Websocket
+     * Since the WebSocket is closed automatically after 300 seconds of inactivity, we recommend sending ping messages every 150 seconds to keep the connection open.
+     * @param $gardena_websocket_interval
+     */
     private function SetGardenaWebsocketInterval($gardena_websocket_interval): void
     {
         $interval = $gardena_websocket_interval * 1000 ; // seconds
@@ -169,8 +173,22 @@ class GardenaCloud extends IPSModule
         return $snapshot;
     }
 
+    /** Send Ping to Websocket
+     * every 150 seconds
+     * @return false|string
+     */
     public function UpdateWebsocket()
     {
+        // TODO send Ping Message to Websocket
+        /*
+        $ping = "";
+        $this->SendDataToParent(json_encode([
+            'DataID' => '{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}',
+            'Buffer' => $ping
+        ]));
+        $this->SendDebug('Gardena Websocket Ping', $ping, 0);
+        */
+
         $websocket_response = $this->GetWebSocket();
         $this->SendDebug('Refresh Websocket', json_encode($websocket_response), 0);
         return $websocket_response;
