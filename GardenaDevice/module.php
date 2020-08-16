@@ -880,7 +880,8 @@ class GardenaDevice extends IPSModule
             // check websocket response
             if(isset($payload['type']))
             {
-                $this->SendDebug('Websocket Data', 'Type: ' . $payload['type'], 0);
+                $type = $payload['type'];
+                $this->SendDebug('Websocket Data', 'Type: ' . $type, 0);
                 if ($type == 'VALVE') {
                     $this->SendDebug('Websocket Data', 'GetValveData', 0);
                     $this->GetValveData($payload);
