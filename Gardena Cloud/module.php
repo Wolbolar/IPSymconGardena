@@ -103,12 +103,15 @@ class GardenaCloud extends IPSModule
         $this->RegisterOAuth($this->oauthIdentifer);
         $gardena_interval = $this->ReadPropertyInteger('UpdateInterval');
         $this->SetGardenaInterval($gardena_interval);
-        $this->GetWebSocket();
 
         if ($this->ReadAttributeString('Token') == '') {
             $this->SetStatus(IS_INACTIVE);
         } else {
-            $this->SetStatus(IS_ACTIVE);
+            if($this->GetWebSocket()) {
+                $this->SetStatus(IS_ACTIVE);
+            } else {
+                $this->SetStatus(IS_EBASE);
+            }
         }
     }
 
@@ -330,6 +333,10 @@ class GardenaCloud extends IPSModule
 
             $data = json_encode($payload);
             $websocket_response = $this->PostData(self::SMART_SYSTEM_BASE_URL . self::WEBSOCKET, $data);
+            if($websocket_response)
+            {
+                $this->SendDebug('Websocket Respone', $websocket_response, 0);
+            }
             $response = true;
         }
         if ($response) {

@@ -10,7 +10,7 @@ class GardenaDevice extends IPSModule
     use ProfileHelper;
 
     // helper properties
-    private $position = 0;
+    private int $position = 0;
 
     private const GARDENA_smart_Water_Control = 'GARDENA smart Water Control';
     private const GARDENA_smart_Irrigation_Control = 'GARDENA smart Irrigation Control';
@@ -509,7 +509,8 @@ class GardenaDevice extends IPSModule
      * @param $profile
      * @param $position
      * @param $vartype
-     * @param $visible
+     * @param $enableaction
+     * @param bool $visible
      *
      * @return bool|int
      */
@@ -636,6 +637,10 @@ class GardenaDevice extends IPSModule
 
     /** Control behaviour of devices.
      * PUT
+     * @param string $service_id
+     * @param string $type
+     * @param string $command
+     * @param string $parameter
      */
     public function ControlDevice(string $service_id, string $type, string $command, string $parameter)
     {
@@ -662,6 +667,7 @@ class GardenaDevice extends IPSModule
 
     /** START
      * manual operation, use 'seconds' attribute to define
+     * @param int $index
      */
     public function OpenValve(int $index)
     {
@@ -671,6 +677,8 @@ class GardenaDevice extends IPSModule
 
     /** START for Interval
      * manual operation, use 'seconds' attribute to define
+     * @param int $index
+     * @param int $seconds
      */
     public function OpenValveForPeriod(int $index, int $seconds)
     {
