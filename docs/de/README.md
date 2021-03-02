@@ -2,7 +2,7 @@
 [![Version](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Version](https://img.shields.io/badge/Symcon%20Version-5.0%20%3E-green.svg)](https://www.symcon.de/forum/threads/38222-IP-Symcon-5-0-verf%C3%BCgbar)
 
-Modul für IP-Symcon ab Version 5. Ermöglicht die Kommunikation mit Gardena Geräten.
+Modul für IP-Symcon ab Version 5.5 Ermöglicht die Kommunikation mit Gardena Geräten.
 
 ## Dokumentation
 
@@ -20,7 +20,7 @@ Steuerung von Gardena Geräten über die Gardena API.
 
 ## 2. Voraussetzungen
 
- - IPS 5.2
+ - IPS 5.5
  - Gardena Benutzername und Gardena Smart Gateway
  - IP-Symcon Connect
 
@@ -31,7 +31,7 @@ Steuerung von Gardena Geräten über die Gardena API.
 Die Webconsole von IP-Symcon mit _http://{IP-Symcon IP}:3777/console/_ öffnen. 
 
 
-Anschließend oben rechts auf das Symbol für den Modulstore (IP-Symcon > 5.2) klicken
+Anschließend oben rechts auf das Symbol für den Modulstore (IP-Symcon > 5.5) klicken
 
 ![Store](img/store_icon.png?raw=true "open store")
 

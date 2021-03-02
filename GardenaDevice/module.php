@@ -10,13 +10,12 @@ class GardenaDevice extends IPSModule
     use ProfileHelper;
 
     // helper properties
-    private int $position = 0;
-
     private const GARDENA_smart_Water_Control = 'GARDENA smart Water Control';
     private const GARDENA_smart_Irrigation_Control = 'GARDENA smart Irrigation Control';
     private const GARDENA_smart_Sensor = 'GARDENA smart Sensor';
     private const GARDENA_smart_Mower = 'GARDENA smart Mower';
     private const PICTURE_LOGO_GARDENA = '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';
+    private int $position = 0;
 
     public function Create()
     {
@@ -76,6 +75,18 @@ class GardenaDevice extends IPSModule
         $this->RegisterAttributeBoolean('VALVE_5_ACTIVITY_STATE_enabled', false);
         $this->RegisterAttributeBoolean('VALVE_6_ACTIVITY_STATE', false);
         $this->RegisterAttributeBoolean('VALVE_6_ACTIVITY_STATE_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_1_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_1_WATERING_INTERVAL_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_2_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_2_WATERING_INTERVAL_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_3_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_3_WATERING_INTERVAL_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_4_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_4_WATERING_INTERVAL_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_5_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_5_WATERING_INTERVAL_enabled', false);
+        $this->RegisterAttributeInteger('VALVE_6_WATERING_INTERVAL', 60);
+        $this->RegisterAttributeBoolean('VALVE_6_WATERING_INTERVAL_enabled', false);
         $this->RegisterAttributeInteger('VALVE_1_ACTIVITY_TIMESTAMP', 0);
         $this->RegisterAttributeBoolean('VALVE_1_ACTIVITY_TIMESTAMP_enabled', false);
         $this->RegisterAttributeInteger('VALVE_2_ACTIVITY_TIMESTAMP', 0);
@@ -164,6 +175,26 @@ class GardenaDevice extends IPSModule
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        switch ($Message) {
+            case IM_CHANGESTATUS:
+                if ($Data[0] === IS_ACTIVE) {
+                    $this->ApplyChanges();
+                }
+                break;
+
+            case IPS_KERNELMESSAGE:
+                if ($Data[0] === KR_READY) {
+                    $this->ApplyChanges();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
     public function ApplyChanges()
     {
         //Never delete this line!
@@ -188,39 +219,8 @@ class GardenaDevice extends IPSModule
         }
     }
 
-    private function CheckRequest()
-    {
-        $id = $this->ReadPropertyString('id');
-        $data = false;
-        if ($id == '') {
-            $this->SetStatus(205);
-        } elseif ($id != '') {
-            $data = $this->RequestStatus('snapshot');
-        }
-        return $data;
-    }
-
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
-    {
-        switch ($Message) {
-            case IM_CHANGESTATUS:
-                if ($Data[0] === IS_ACTIVE) {
-                    $this->ApplyChanges();
-                }
-                break;
-
-            case IPS_KERNELMESSAGE:
-                if ($Data[0] === KR_READY) {
-                    $this->ApplyChanges();
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
 
     private function RegisterVariables(): void
     {
@@ -240,18 +240,46 @@ class GardenaDevice extends IPSModule
         if ($model_type == self::GARDENA_smart_Irrigation_Control) {
             $valve_1_name = $this->ReadAttributeString('VALVE_1_NAME');
             $valve_1_state = $this->ReadAttributeString('VALVE_1_STATE');
-            if($valve_1_state == 'AVAILABLE' || $valve_1_state == 'OK')
-            {
+            $this->RegisterProfile('Gardena.Irrigation.Interval', 'Clock', '', ' min', 0, 180, 1, 0, VARIABLETYPE_INTEGER);
+            // todo string profile 5.6
+            /*
+            $activity_ass = [
+                ['OPEN', $this->Translate("open"), "", -1],
+                ['CLOSED', $this->Translate("closed"), "", -1]];
+            $this->RegisterProfileAssociation('Gardena.Valve.Acitivity', '', '', '', 0, 1, 0, 0, VARIABLETYPE_STRING, $activity_ass);
+            $available_ass = [
+                ['AVAILABLE', $this->Translate("available"), "", -1],
+                ['UNAVAILABLE', $this->Translate("unavailable"), "", -1],
+                ['OK', $this->Translate("ok"), "", -1]];
+            $this->RegisterProfileAssociation('Gardena.Valve.Available', 'Network', '', '', 0, 1, 0, 0, VARIABLETYPE_STRING, $available_ass);
+            $error_ass = [
+                ['NO_MESSAGE', $this->Translate("no message"), "", -1],
+                ['UNAVAILABLE', $this->Translate("unavailable"), "", -1],
+                ['OK', $this->Translate("ok"), "", -1]];
+            $this->RegisterProfileAssociation('Gardena.Valve.Error', 'Network', '', '', 0, 1, 0, 0, VARIABLETYPE_STRING, $error_ass);
+            */
+            if ($valve_1_state == 'AVAILABLE' || $valve_1_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_1_ACTIVITY_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_1_ACTIVITY_STATE', $this->Translate($valve_1_name) . ' ' . $this->Translate('irrigation'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_1_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_1_ERRORCODE', $valve_1_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_1_ACTIVITY', $this->Translate($valve_1_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                ); // Gardena.Valve.Acitivity
+                $this->SetupVariable(
+                    'VALVE_1_STATE', $this->Translate($valve_1_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                ); // Gardena.Valve.Available
+                $this->SetupVariable(
+                    'VALVE_1_ERRORCODE', $valve_1_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_1_WATERING_INTERVAL', $valve_1_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_1_ACTIVITY_TIMESTAMP', $valve_1_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_1_ACTIVITY_STATE', $this->Translate($valve_1_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -261,18 +289,28 @@ class GardenaDevice extends IPSModule
             }
             $valve_2_name = $this->ReadAttributeString('VALVE_2_NAME');
             $valve_2_state = $this->ReadAttributeString('VALVE_2_STATE');
-            if($valve_2_state == 'AVAILABLE' || $valve_2_state == 'OK')
-            {
+            if ($valve_2_state == 'AVAILABLE' || $valve_2_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_2_ACTIVITY_STATE', $this->Translate($valve_2_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_2_ACTIVITY_STATE', $this->Translate($valve_2_name) . ' ' . $this->Translate('irrigation'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_2_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_2_ERRORCODE', $valve_2_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_2_ACTIVITY', $this->Translate($valve_2_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                $this->SetupVariable(
+                    'VALVE_2_STATE', $this->Translate($valve_2_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                $this->SetupVariable(
+                    'VALVE_2_ERRORCODE', $valve_2_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_2_WATERING_INTERVAL', $valve_2_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_2_ACTIVITY_TIMESTAMP', $valve_2_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_2_ACTIVITY_STATE', $this->Translate($valve_2_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -282,18 +320,28 @@ class GardenaDevice extends IPSModule
             }
             $valve_3_name = $this->ReadAttributeString('VALVE_3_NAME');
             $valve_3_state = $this->ReadAttributeString('VALVE_3_STATE');
-            if($valve_3_state == 'AVAILABLE' || $valve_3_state == 'OK')
-            {
+            if ($valve_3_state == 'AVAILABLE' || $valve_3_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_3_ACTIVITY_STATE', $this->Translate($valve_3_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_3_ACTIVITY_STATE', $this->Translate($valve_3_name) . ' ' . $this->Translate('irrigation'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_3_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_3_ERRORCODE', $valve_3_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_3_ACTIVITY', $this->Translate($valve_3_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                $this->SetupVariable(
+                    'VALVE_3_STATE', $this->Translate($valve_3_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                $this->SetupVariable(
+                    'VALVE_3_ERRORCODE', $valve_3_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_3_WATERING_INTERVAL', $valve_3_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_3_ACTIVITY_TIMESTAMP', $valve_3_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_3_ACTIVITY_STATE', $this->Translate($valve_3_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -303,18 +351,28 @@ class GardenaDevice extends IPSModule
             }
             $valve_4_name = $this->ReadAttributeString('VALVE_4_NAME');
             $valve_4_state = $this->ReadAttributeString('VALVE_4_STATE');
-            if($valve_4_state == 'AVAILABLE' || $valve_4_state == 'OK')
-            {
+            if ($valve_4_state == 'AVAILABLE' || $valve_4_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_4_ACTIVITY_STATE', $this->Translate($valve_4_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_4_ACTIVITY_STATE', $this->Translate($valve_4_name) . ' ' . $this->Translate('activity'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_4_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_4_ERRORCODE', $valve_4_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_4_ACTIVITY', $this->Translate($valve_4_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                $this->SetupVariable(
+                    'VALVE_4_STATE', $this->Translate($valve_4_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                $this->SetupVariable(
+                    'VALVE_4_ERRORCODE', $valve_4_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_4_WATERING_INTERVAL', $valve_4_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_4_ACTIVITY_TIMESTAMP', $valve_4_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_4_ACTIVITY_STATE', $this->Translate($valve_4_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -324,18 +382,28 @@ class GardenaDevice extends IPSModule
             }
             $valve_5_name = $this->ReadAttributeString('VALVE_5_NAME');
             $valve_5_state = $this->ReadAttributeString('VALVE_5_STATE');
-            if($valve_5_state == 'AVAILABLE' || $valve_5_state == 'OK')
-            {
+            if ($valve_5_state == 'AVAILABLE' || $valve_5_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_5_ACTIVITY_STATE', $this->Translate($valve_5_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_5_ACTIVITY_STATE', $this->Translate($valve_5_name) . ' ' . $this->Translate('activity'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_5_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_5_ERRORCODE', $valve_5_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_5_ACTIVITY', $this->Translate($valve_5_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                $this->SetupVariable(
+                    'VALVE_5_STATE', $this->Translate($valve_5_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                $this->SetupVariable(
+                    'VALVE_5_ERRORCODE', $valve_5_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_5_WATERING_INTERVAL', $valve_5_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_5_ACTIVITY_TIMESTAMP', $valve_5_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_5_ACTIVITY_STATE', $this->Translate($valve_5_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -345,18 +413,28 @@ class GardenaDevice extends IPSModule
             }
             $valve_6_name = $this->ReadAttributeString('VALVE_6_NAME');
             $valve_6_state = $this->ReadAttributeString('VALVE_6_STATE');
-            if($valve_6_state == 'AVAILABLE' || $valve_6_state == 'OK')
-            {
+            if ($valve_6_state == 'AVAILABLE' || $valve_6_state == 'OK') {
                 $this->SetupVariable(
-                    'VALVE_6_ACTIVITY_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, true
+                    'VALVE_6_ACTIVITY_STATE', $this->Translate($valve_6_name) . ' ' . $this->Translate('activity'), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
                 $this->WriteAttributeBoolean('VALVE_6_ACTIVITY_STATE_enabled', true);
                 $this->SetupVariable(
-                    'VALVE_6_ERRORCODE', $valve_6_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, true
+                    'VALVE_6_ACTIVITY', $this->Translate($valve_6_name) . ' ' . $this->Translate('activity'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
-            }
-            else
-            {
+                $this->SetupVariable(
+                    'VALVE_6_STATE', $this->Translate($valve_6_name) . ' ' . $this->Translate('available'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                $this->SetupVariable(
+                    'VALVE_6_ERRORCODE', $valve_6_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+                );
+                // todo check max value
+                $this->SetupVariable(
+                    'VALVE_6_WATERING_INTERVAL', $valve_6_name . " " . $this->Translate('irrigation interval'), 'Gardena.Irrigation.Interval', $this->_getPosition(), VARIABLETYPE_INTEGER, true, false
+                );
+                $this->SetupVariable(
+                    'VALVE_6_ACTIVITY_TIMESTAMP', $valve_6_name . " " . $this->Translate('timestamp'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+                );
+            } else {
                 $this->SetupVariable(
                     'VALVE_6_ACTIVITY_STATE', $this->Translate($valve_6_name), '~Switch', $this->_getPosition(), VARIABLETYPE_BOOLEAN, true, false
                 );
@@ -364,7 +442,6 @@ class GardenaDevice extends IPSModule
                     'VALVE_6_ERRORCODE', $valve_6_name . " " . $this->Translate('error code'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
                 );
             }
-
             $this->SetupVariable(
                 'RF_LINK_STATE', $this->Translate('rf link state'), 'Gardena.Reachable', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
             );
@@ -498,8 +575,6 @@ class GardenaDevice extends IPSModule
             // TODO add Mover variables
         }
         // $this->WriteValues();
-
-
     }
 
     /** Variable anlegen / löschen
@@ -537,16 +612,14 @@ class GardenaDevice extends IPSModule
                         } else {
                             $value = false;
                         }
-                    }elseif($ident == 'RF_LINK_STATE')
-                    {
+                    } elseif ($ident == 'RF_LINK_STATE') {
                         $string_value = $this->ReadAttributeString($ident);
                         if ($string_value == 'ONLINE') {
                             $value = true;
                         } else {
                             $value = false;
                         }
-                    }
-                    else {
+                    } else {
                         $value = $this->ReadAttributeBoolean($ident);
                     }
                     break;
@@ -574,155 +647,77 @@ class GardenaDevice extends IPSModule
         } else {
             $objid = @$this->GetIDForIdent($ident);
             if ($objid > 0) {
+                $this->SendDebug('Gardena Variable:', 'Variable with Ident ' . $ident . ' is not shown, delelete variable', 0);
                 $this->UnregisterVariable($ident);
             }
         }
         return $objid;
     }
 
+    /**
+     * return incremented position
+     * @return int
+     */
+    private function _getPosition()
+    {
+        $this->position++;
+        return $this->position;
+    }
+
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function RequestAction($Ident, $Value)
+
+    private function GetDeviceStatus()
     {
-        if ($Ident === 'VALVE_1_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 1);
-        }
-        if ($Ident === 'VALVE_2_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 2);
-        }
-        if ($Ident === 'VALVE_3_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 3);
-        }
-        if ($Ident === 'VALVE_4_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 4);
-        }
-        if ($Ident === 'VALVE_5_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 5);
-        }
-        if ($Ident === 'VALVE_6_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 6);
-        }
-        if ($Ident === 'VALVE_WATERCONTROL_ACTIVITY_STATE') {
-            $this->ToggleValve($Value, 0);
+        $snapshot = $this->RequestStatus('snapshot');
+        if ($snapshot != '[]') {
+            $this->CheckDeviceData($snapshot);
         }
     }
 
     // GARDENA smart system API
 
-    /** Fetch current state of devices and then get subsequent updates in realtime.
-     * POST
-     */
-    public function FetchCurrentState()
+    private function CheckDeviceData($snapshot)
     {
-        $locationId = $this->RequestStatus('location_id');
-        $this->SendDebug('Gardena Location ID', $locationId, 0);
-        // $payload = json_decode($snapshot, true);
-        $service_id = '';
-        $payload = ['data' => [
-            'id' => $service_id,
-            'type' => 'WEBSOCKET',
-            'attributes' => [
-                'locationId' => $locationId
-            ]
-        ]];
-        $data = json_encode($payload);
-        $result = json_decode($this->SendDataToParent(json_encode([
-            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
-            'Type' => 'POST',
-            'Endpoint' => '/websocket',
-            'Payload' => $data
-        ])));
-        return $result;
-    }
-
-    /** Control behaviour of devices.
-     * PUT
-     * @param string $service_id
-     * @param string $type
-     * @param string $command
-     * @param string $parameter
-     */
-    public function ControlDevice(string $service_id, string $type, string $command, string $parameter)
-    {
-        $payload = ['data' => [
-            'id' => $service_id,
-            'type' => $type,
-            'attributes' => [
-                'command' => $command,
-                'seconds' => $parameter
-            ]
-        ]];
-        $data = json_encode($payload);
-        $this->SendCommand($service_id, $data);
-    }
-
-    public function ToggleValve(bool $state, int $index)
-    {
-        if ($state) {
-            $this->OpenValve($index);
-        } else {
-            $this->StopValve($index);
+        $payload = json_decode($snapshot, true);
+        if (!empty($snapshot)) {
+            // check snapshot
+            if (isset($payload['included'])) {
+                $included = $payload['included'];
+                foreach ($included as $device) {
+                    $type = $device['type'];
+                    if ($type == 'VALVE') {
+                        $this->GetValveData($device);
+                    }
+                    if ($type == 'COMMON') {
+                        $this->GetDeviceData($device);
+                    }
+                    if ($type == 'SENSOR') {
+                        $this->GetSensorData($device);
+                    }
+                }
+                $this->WriteValues();
+            }
+            // check websocket response
+            if (isset($payload['type'])) {
+                $type = $payload['type'];
+                $this->SendDebug('Websocket Data', 'Type: ' . $type, 0);
+                if ($type == 'VALVE') {
+                    $this->SendDebug('Websocket Data', 'GetValveData', 0);
+                    $this->GetValveData($payload);
+                }
+                if ($type == 'COMMON') {
+                    $this->SendDebug('Websocket Data', 'GetDeviceData', 0);
+                    $this->GetDeviceData($payload);
+                }
+                if ($type == 'SENSOR') {
+                    $this->SendDebug('Websocket Data', 'GetSensorData', 0);
+                    $this->GetSensorData($payload);
+                }
+                $this->WriteValues();
+            }
         }
     }
-
-    /** START
-     * manual operation, use 'seconds' attribute to define
-     * @param int $index
-     */
-    public function OpenValve(int $index)
-    {
-        $id = $this->GetValveID($index);
-        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', $this->GetWateringInterval());
-    }
-
-    /** START for Interval
-     * manual operation, use 'seconds' attribute to define
-     * @param int $index
-     * @param int $seconds
-     */
-    public function OpenValveForPeriod(int $index, int $seconds)
-    {
-        $id = $this->GetValveID($index);
-        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', strval($seconds));
-    }
-    
-    private function GetWateringInterval()
-    {
-        // TODO add interval slider
-        $seconds = strval(3600);
-        return $seconds;
-    }
-
-    public function StopValve(int $index)
-    {
-        $id = $this->GetValveID($index);
-        $this->ControlDevice($id, 'VALVE_CONTROL', 'STOP_UNTIL_NEXT_TASK', "0");
-    }
-
-    public function PauseValve(int $index)
-    {
-        $id = $this->GetValveID($index);
-        $this->ControlDevice($id, 'VALVE_CONTROL', 'PAUSE', "0");
-    }
-
-    public function UnpauseValve(int $index)
-    {
-        $id = $this->GetValveID($index);
-        $this->ControlDevice($id, 'VALVE_CONTROL', 'UNPAUSE', "0");
-    }
-
-    private function GetValveID($index)
-    {
-        if($index == 0)
-        {
-            $valve_id = $this->ReadAttributeString('id');
-        }
-        else{
-            $valve_id = $this->ReadAttributeString('id') . ':' . $index;
-        }
-        return $valve_id;
-    }
-
 
     private function GetValveData($device)
     {
@@ -739,8 +734,7 @@ class GardenaDevice extends IPSModule
         if ($instance_id == $id) {
             $this->SendDebug('Gardena Valve ' . $id, $name, 0);
             $this->WriteAttributeString('VALVE_' . $valve_key . '_NAME', $name);
-            if($valve_key == 'WATERCONTROL')
-            {
+            if ($valve_key == 'WATERCONTROL') {
                 if (isset($device['attributes']['activity']['value'])) {
                     $activity = $device['attributes']['activity']['value'];
                     $this->WriteAttributeString('VALVE_WATERCONTROL_ACTIVITY', $activity);
@@ -759,17 +753,13 @@ class GardenaDevice extends IPSModule
                     $lastErrorCode_timestamp = $device['attributes']['lastErrorCode']['timestamp'];
                     $this->WriteAttributeInteger('VALVE_WATERCONTROL_ERRORCODE_TIMESTAMP', $this->CalculateTime($lastErrorCode_timestamp, 'Device ' . $name . ' last error code'));
                 }
-            }
-            else{
+            } else {
                 if (isset($device['attributes']['activity']['value'])) {
                     $activity = $device['attributes']['activity']['value'];
                     $this->WriteAttributeString('VALVE_' . $valve_key . '_ACTIVITY', $activity);
-                    if($activity == 'OPEN')
-                    {
+                    if ($activity == 'OPEN') {
                         $this->WriteAttributeBoolean('VALVE_' . $valve_key . '_ACTIVITY_STATE', true);
-                    }
-                    elseif($activity == 'CLOSED')
-                    {
+                    } elseif ($activity == 'CLOSED') {
                         $this->WriteAttributeBoolean('VALVE_' . $valve_key . '_ACTIVITY_STATE', false);
                     }
                     $activity_timestamp = $device['attributes']['activity']['timestamp'];
@@ -793,6 +783,15 @@ class GardenaDevice extends IPSModule
         return $name;
     }
 
+    private function CalculateTime($time_string, $subject)
+    {
+        $date = new DateTime($time_string);
+        $date->setTimezone(new DateTimeZone('Europe/Berlin'));
+        $timestamp = $date->getTimestamp();
+        $this->SendDebug('Gardena ' . $subject . ' Timestamp', $date->format('Y-m-d H:i:sP'), 0);
+        return $timestamp;
+    }
+
     /** Get Device Type
      * @param $device
      */
@@ -807,11 +806,26 @@ class GardenaDevice extends IPSModule
                 $this->GetIrrigationControlData($device);
             } elseif ($model_type == self::GARDENA_smart_Sensor) {
                 $this->GetSensorInfo($device);
-            }
-            elseif ($model_type == self::GARDENA_smart_Mower) {
+            } elseif ($model_type == self::GARDENA_smart_Mower) {
                 $this->GetMoverData($device);
             }
         }
+    }
+
+    /** Get Irrigation Control Data
+     * @param $device
+     * @return array
+     */
+    private function GetIrrigationControlData($device)
+    {
+        $id = $device['id'];
+        $name = $device['attributes']['name']['value'];
+        $serial = $device['attributes']['serial']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
+        $rf_link_state = $device['attributes']['rfLinkState']['value'];
+        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
+        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
+        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
 
     /** Get Sensor Info
@@ -843,22 +857,6 @@ class GardenaDevice extends IPSModule
         $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
         $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
 
-        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
-    }
-
-    /** Get Irrigation Control Data
-     * @param $device
-     * @return array
-     */
-    private function GetIrrigationControlData($device)
-    {
-        $id = $device['id'];
-        $name = $device['attributes']['name']['value'];
-        $serial = $device['attributes']['serial']['value'];
-        $this->SendDebug('Gardena Device ' . $name, 'serial: ' . $serial, 0);
-        $rf_link_state = $device['attributes']['rfLinkState']['value'];
-        $this->SendDebug('Gardena Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        $this->WriteAttributeString('RF_LINK_STATE', $rf_link_state);
         return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state];
     }
 
@@ -917,64 +915,73 @@ class GardenaDevice extends IPSModule
         $this->WriteAttributeInteger('light_intensity_timestamp', $this->CalculateTime($light_intensity_timestamp, 'Sensor Light Intensity'));
     }
 
-    private function CalculateTime($time_string, $subject)
+    private function WriteValues()
     {
-        $date = new DateTime($time_string);
-        $date->setTimezone(new DateTimeZone('Europe/Berlin'));
-        $timestamp = $date->getTimestamp();
-        $this->SendDebug('Gardena ' . $subject . ' Timestamp', $date->format('Y-m-d H:i:sP'), 0);
-        return $timestamp;
-    }
-
-    private function GetDeviceStatus()
-    {
-        $snapshot = $this->RequestStatus('snapshot');
-        if ($snapshot != '[]') {
-            $this->CheckDeviceData($snapshot);
+        $model_type_instance = $this->ReadPropertyString('model_type');
+        if ($model_type_instance == self::GARDENA_smart_Irrigation_Control) {
+            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Irrigation_Control, 0);
+            $this->WriteEnabledValue('VALVE_1_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_1_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_1_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_1_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_2_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_2_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_2_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_2_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_3_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_3_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_3_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_3_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_4_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_4_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_4_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_4_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_5_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_5_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_5_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_5_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_6_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_6_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_6_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_6_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_1_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_2_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_3_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_4_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_5_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_6_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
         }
-    }
 
-    private function CheckDeviceData($snapshot)
-    {
-        $payload = json_decode($snapshot, true);
-        if (!empty($snapshot)) {
-            // check snapshot
-            if(isset($payload['included']))
-            {
-                $included = $payload['included'];
-                foreach ($included as $device) {
-                    $type = $device['type'];
-                    if ($type == 'VALVE') {
-                        $this->GetValveData($device);
-                    }
-                    if ($type == 'COMMON') {
-                        $this->GetDeviceData($device);
-                    }
-                    if ($type == 'SENSOR') {
-                        $this->GetSensorData($device);
-                    }
-                }
-                $this->WriteValues();
-            }
-            // check websocket response
-            if(isset($payload['type']))
-            {
-                $type = $payload['type'];
-                $this->SendDebug('Websocket Data', 'Type: ' . $type, 0);
-                if ($type == 'VALVE') {
-                    $this->SendDebug('Websocket Data', 'GetValveData', 0);
-                    $this->GetValveData($payload);
-                }
-                if ($type == 'COMMON') {
-                    $this->SendDebug('Websocket Data', 'GetDeviceData', 0);
-                    $this->GetDeviceData($payload);
-                }
-                if ($type == 'SENSOR') {
-                    $this->SendDebug('Websocket Data', 'GetSensorData', 0);
-                    $this->GetSensorData($payload);
-                }
-                $this->WriteValues();
-            }
+        if ($model_type_instance == self::GARDENA_smart_Water_Control) {
+            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Water_Control, 0);
+            //todo all 6
+            $this->WriteEnabledValue('VALVE_WATERCONTROL_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('VALVE_WATERCONTROL_ACTIVITY', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_WATERCONTROL_ACTIVITY_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('VALVE_WATERCONTROL_STATE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('VALVE_WATERCONTROL_ERRORCODE', VARIABLETYPE_STRING);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
+
+
+        }
+        if ($model_type_instance == self::GARDENA_smart_Sensor) {
+            $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
+            $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
+            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_BOOLEAN, true);
+            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
+            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
+            $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
+            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
+            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('ambient_temperature', VARIABLETYPE_FLOAT, true);
+            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_INTEGER);
+            $this->WriteEnabledValue('light_intensity', VARIABLETYPE_INTEGER, true);
+            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_INTEGER);
         }
     }
 
@@ -998,8 +1005,7 @@ class GardenaDevice extends IPSModule
                             $value = false;
                             $debug_value = 'false';
                         }
-                    }
-                    else {
+                    } else {
                         $value = $this->ReadAttributeBoolean($ident);
                         $debug_value = strval($value);
                     }
@@ -1027,79 +1033,84 @@ class GardenaDevice extends IPSModule
 
     private function SetVariableValue($ident, $value)
     {
-        if(@$this->GetIDForIdent($ident))
-        {
+        if (@$this->GetIDForIdent($ident)) {
             $this->SetValue($ident, $value);
         }
     }
 
-    private function WriteValues()
+    public function RequestAction($Ident, $Value)
     {
-        $model_type_instance = $this->ReadPropertyString('model_type');
-        if ($model_type_instance == self::GARDENA_smart_Irrigation_Control) {
-            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Irrigation_Control, 0);
-            $this->WriteEnabledValue('VALVE_1_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_2_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_3_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_4_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_5_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_6_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_1_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('VALVE_2_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('VALVE_3_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('VALVE_4_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('VALVE_5_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('VALVE_6_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
+        if ($Ident === 'VALVE_1_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 1);
         }
-
-        if ($model_type_instance == self::GARDENA_smart_Water_Control) {
-            $this->SendDebug('Gardena Request Response', self::GARDENA_smart_Water_Control, 0);
-            $this->WriteEnabledValue('VALVE_WATERCONTROL_ACTIVITY_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('VALVE_WATERCONTROL_ERRORCODE', VARIABLETYPE_STRING);
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
+        if ($Ident === 'VALVE_2_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 2);
         }
-
-        if ($model_type_instance == self::GARDENA_smart_Sensor) {
-            $this->SendDebug('Gardena Write Values', self::GARDENA_smart_Sensor, 0);
-            $this->WriteEnabledValue('BATTERY_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('BATTERY_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('BATTERY_STATE', VARIABLETYPE_BOOLEAN, true);
-            $this->WriteEnabledValue('BATTERY_STATE_TIMESTAMP', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('RF_LINK_LEVEL', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('RF_LINK_LEVEL_TIMESTAMP', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('RF_LINK_STATE', VARIABLETYPE_BOOLEAN);
-            $this->WriteEnabledValue('soil_humidity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('soil_humidity_timestamp', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('soil_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('soil_temperature_timestamp', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('ambient_temperature', VARIABLETYPE_FLOAT, true);
-            $this->WriteEnabledValue('ambient_temperature_timestamp', VARIABLETYPE_INTEGER);
-            $this->WriteEnabledValue('light_intensity', VARIABLETYPE_INTEGER, true);
-            $this->WriteEnabledValue('light_intensity_timestamp', VARIABLETYPE_INTEGER);
+        if ($Ident === 'VALVE_3_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 3);
+        }
+        if ($Ident === 'VALVE_4_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 4);
+        }
+        if ($Ident === 'VALVE_5_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 5);
+        }
+        if ($Ident === 'VALVE_6_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 6);
+        }
+        if ($Ident === 'VALVE_WATERCONTROL_ACTIVITY_STATE') {
+            $this->ToggleValve($Value, 0);
         }
     }
 
-    public function RequestStatus(string $endpoint)
+    public function ToggleValve(bool $state, int $index)
     {
-        $data = $this->SendDataToParent(json_encode([
-            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
-            'Type' => 'GET',
-            'Endpoint' => $endpoint,
-            'Payload' => ''
-        ]));
-        $this->SendDebug('Gardena Request Response', $data, 0);
-        return $data;
+        if ($state) {
+            $this->OpenValve($index);
+        } else {
+            $this->StopValve($index);
+        }
     }
 
-    public function ReceiveData($JSONString)
+    /** START
+     * manual operation, use 'seconds' attribute to define
+     * @param int $index
+     */
+    public function OpenValve(int $index)
     {
-        $data = json_decode($JSONString);
-        $snapshot = $data->Buffer;
-        $this->SendDebug('Receive Snapshot', $snapshot, 0);
-        if ($snapshot != '[]') {
-            $this->CheckDeviceData($snapshot);
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', $this->GetWateringInterval($index));
+    }
+
+    private function GetValveID($index)
+    {
+        if ($index == 0) {
+            $valve_id = $this->ReadAttributeString('id');
+        } else {
+            $valve_id = $this->ReadAttributeString('id') . ':' . $index;
         }
+        return $valve_id;
+    }
+
+    /** Control behaviour of devices.
+     * PUT
+     * @param string $service_id
+     * @param string $type
+     * @param string $command
+     * @param string $parameter
+     */
+    public function ControlDevice(string $service_id, string $type, string $command, string $parameter)
+    {
+        $payload = ['data' => [
+            'id' => $service_id,
+            'type' => $type,
+            'attributes' => [
+                'command' => $command,
+                'seconds' => $parameter
+            ]
+        ]];
+        $data = json_encode($payload);
+        $this->SendCommand($service_id, $data);
     }
 
     public function SendCommand(string $service_id, string $data)
@@ -1113,6 +1124,78 @@ class GardenaDevice extends IPSModule
         return $result;
     }
 
+    private function GetWateringInterval($index)
+    {
+        $minutes = $this->ReadAttributeInteger('VALVE_' . $index . '_WATERING_INTERVAL');
+        $interval = $minutes * 60; // in seconds
+        return strval($interval);
+    }
+
+    public function StopValve(int $index)
+    {
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'STOP_UNTIL_NEXT_TASK', "0");
+    }
+
+    /** Fetch current state of devices and then get subsequent updates in realtime.
+     * POST
+     */
+    public function FetchCurrentState()
+    {
+        $locationId = $this->RequestStatus('location_id');
+        $this->SendDebug('Gardena Location ID', $locationId, 0);
+        // $payload = json_decode($snapshot, true);
+        $service_id = '';
+        $payload = ['data' => [
+            'id' => $service_id,
+            'type' => 'WEBSOCKET',
+            'attributes' => [
+                'locationId' => $locationId
+            ]
+        ]];
+        $data = json_encode($payload);
+        $result = json_decode($this->SendDataToParent(json_encode([
+            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
+            'Type' => 'POST',
+            'Endpoint' => '/websocket',
+            'Payload' => $data
+        ])));
+        return $result;
+    }
+
+    /** START for Interval
+     * manual operation, use 'seconds' attribute to define
+     * @param int $index
+     * @param int $seconds
+     */
+    public function OpenValveForPeriod(int $index, int $seconds)
+    {
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'START_SECONDS_TO_OVERRIDE', strval($seconds));
+    }
+
+    public function PauseValve(int $index)
+    {
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'PAUSE', "0");
+    }
+
+    public function UnpauseValve(int $index)
+    {
+        $id = $this->GetValveID($index);
+        $this->ControlDevice($id, 'VALVE_CONTROL', 'UNPAUSE', "0");
+    }
+
+    public function ReceiveData($JSONString)
+    {
+        $data = json_decode($JSONString);
+        $snapshot = $data->Buffer;
+        $this->SendDebug('Receive Snapshot', $snapshot, 0);
+        if ($snapshot != '[]') {
+            $this->CheckDeviceData($snapshot);
+        }
+    }
+
     public function SetWebFrontVariable(string $ident, bool $value)
     {
         $this->WriteAttributeBoolean($ident, $value);
@@ -1124,10 +1207,6 @@ class GardenaDevice extends IPSModule
 
         $this->RegisterVariables();
     }
-
-    /***********************************************************
-     * Configuration Form
-     ***********************************************************/
 
     /**
      * build configuration form
@@ -1143,6 +1222,10 @@ class GardenaDevice extends IPSModule
         ]);
     }
 
+    /***********************************************************
+     * Configuration Form
+     ***********************************************************/
+
     /**
      * return form configurations on configuration step
      * @return array
@@ -1153,7 +1236,7 @@ class GardenaDevice extends IPSModule
         if ($data != false) {
             $form = [
                 [
-                    'type'  => 'Image',
+                    'type' => 'Image',
                     'image' => 'data:image/png;base64, ' . self::PICTURE_LOGO_GARDENA],
                 [
                     'type' => 'Label',
@@ -1179,6 +1262,30 @@ class GardenaDevice extends IPSModule
         return $form;
     }
 
+    private function CheckRequest()
+    {
+        $id = $this->ReadPropertyString('id');
+        $data = false;
+        if ($id == '') {
+            $this->SetStatus(205);
+        } elseif ($id != '') {
+            $data = $this->RequestStatus('snapshot');
+        }
+        return $data;
+    }
+
+    public function RequestStatus(string $endpoint)
+    {
+        $data = $this->SendDataToParent(json_encode([
+            'DataID' => '{0FE98840-1BBA-4E87-897D-30506FEF540A}',
+            'Type' => 'GET',
+            'Endpoint' => $endpoint,
+            'Payload' => ''
+        ]));
+        $this->SendDebug('Gardena Request Response', $data, 0);
+        return $data;
+    }
+
     /**
      * return form actions by token
      * @return array
@@ -1186,6 +1293,7 @@ class GardenaDevice extends IPSModule
     protected function FormActions()
     {
         $model_type = $this->ReadPropertyString('model_type');
+        $this->GetDeviceStatus();
         $form = [
             [
                 'name' => 'name_enabled',
@@ -1204,50 +1312,296 @@ class GardenaDevice extends IPSModule
         ];
 
         if ($model_type == self::GARDENA_smart_Irrigation_Control) {
+            $valve_1_name = $this->ReadAttributeString('VALVE_1_NAME');
+            $valve_2_name = $this->ReadAttributeString('VALVE_2_NAME');
+            $valve_3_name = $this->ReadAttributeString('VALVE_3_NAME');
+            $valve_4_name = $this->ReadAttributeString('VALVE_4_NAME');
+            $valve_5_name = $this->ReadAttributeString('VALVE_5_NAME');
+            $valve_6_name = $this->ReadAttributeString('VALVE_6_NAME');
             $form = array_merge_recursive(
                 $form, [
                     [
-                        'name' => 'VALVE_1_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 1',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_1_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_ACTIVITY_STATE_enabled", $VALVE_1_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_1_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_1_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_ACTIVITY_STATE_enabled", $VALVE_1_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_1_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_1_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_1_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_1_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_1_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_1_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_1_WATERING_INTERVAL_enabled", $VALVE_1_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
-                        'name' => 'VALVE_2_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 2',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_2_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_ACTIVITY_STATE_enabled", $VALVE_2_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_2_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_2_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_2_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_ACTIVITY_STATE_enabled", $VALVE_2_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_2_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_2_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_2_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_2_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_2_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_2_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_2_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_2_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_2_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_2_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_2_WATERING_INTERVAL_enabled", $VALVE_2_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
-                        'name' => 'VALVE_3_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 3',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_3_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_ACTIVITY_STATE_enabled", $VALVE_3_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_3_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_3_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_3_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_ACTIVITY_STATE_enabled", $VALVE_3_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_3_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_3_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_3_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_3_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_3_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_3_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_3_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_3_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_3_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_3_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_3_WATERING_INTERVAL_enabled", $VALVE_3_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
-                        'name' => 'VALVE_4_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 4',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_4_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_ACTIVITY_STATE_enabled", $VALVE_4_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_4_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_4_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_4_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_ACTIVITY_STATE_enabled", $VALVE_4_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_4_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_4_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_4_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_4_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_4_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_4_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_4_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_4_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_4_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_4_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_4_WATERING_INTERVAL_enabled", $VALVE_1_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
-                        'name' => 'VALVE_5_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 5',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_5_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_ACTIVITY_STATE_enabled", $VALVE_5_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_5_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_5_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_5_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_ACTIVITY_STATE_enabled", $VALVE_5_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_5_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_5_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_5_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_5_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_5_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_5_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_5_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_5_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_5_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_5_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_5_WATERING_INTERVAL_enabled", $VALVE_5_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
-                        'name' => 'VALVE_6_ACTIVITY_STATE_enabled',
-                        'type' => 'CheckBox',
-                        'caption' => 'valve 6',
-                        'visible' => true,
-                        'value' => $this->ReadAttributeBoolean('VALVE_6_ACTIVITY_STATE_enabled'),
-                        'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_ACTIVITY_STATE_enabled", $VALVE_6_ACTIVITY_STATE_enabled);'],
+                        'type' => 'ExpansionPanel',
+                        'caption' => $valve_6_name,
+                        'items' => [
+                            [
+                                'name' => 'VALVE_6_ACTIVITY_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_6_name . ' ' . $this->Translate('irrigation'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_ACTIVITY_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_ACTIVITY_STATE_enabled", $VALVE_6_ACTIVITY_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_6_ACTIVITY_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_6_name . ' ' . $this->Translate('state'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_ACTIVITY_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_ACTIVITY_enabled", $VALVE_1_ACTIVITY_enabled);'],
+                            [
+                                'name' => 'VALVE_6_STATE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_6_name . ' ' . $this->Translate('reachable'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_STATE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_STATE_enabled", $VALVE_1_STATE_enabled);'],
+                            [
+                                'name' => 'VALVE_6_ACTIVITY_TIMESTAMP_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_6_name . ' ' . $this->Translate('timestamp'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_ACTIVITY_TIMESTAMP_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_ACTIVITY_TIMESTAMP_enabled", $VALVE_1_ACTIVITY_TIMESTAMP_enabled);'],
+                            [
+                                'name' => 'VALVE_6_ERRORCODE_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_6_name . ' ' . $this->Translate('errorcode'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_ERRORCODE_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_ERRORCODE_enabled", $VALVE_1_ERRORCODE_enabled);'],
+                            [
+                                'name' => 'VALVE_6_WATERING_INTERVAL_enabled',
+                                'type' => 'CheckBox',
+                                'caption' => $valve_1_name . ' ' . $this->Translate('irrigation interval'),
+                                'visible' => true,
+                                'value' => $this->ReadAttributeBoolean('VALVE_6_WATERING_INTERVAL_enabled'),
+                                'onChange' => 'Gardena_SetWebFrontVariable($id, "VALVE_6_WATERING_INTERVAL_enabled", $VALVE_6_WATERING_INTERVAL_enabled);']
+                        ]],
                     [
                         'name' => 'RF_LINK_STATE_enabled',
                         'type' => 'CheckBox',
@@ -1316,8 +1670,7 @@ class GardenaDevice extends IPSModule
                         'value' => $this->ReadAttributeBoolean('light_intensity_timestamp_enabled'),
                         'onChange' => 'Gardena_SetWebFrontVariable($id, "light_intensity_timestamp_enabled", $light_intensity_timestamp_enabled);']]
             );
-        }
-        elseif ($model_type == self::GARDENA_smart_Mower) {
+        } elseif ($model_type == self::GARDENA_smart_Mower) {
             $form = array_merge_recursive(
                 $form, [
                     [
@@ -1383,15 +1736,5 @@ class GardenaDevice extends IPSModule
         ];
 
         return $form;
-    }
-
-    /**
-     * return incremented position
-     * @return int
-     */
-    private function _getPosition()
-    {
-        $this->position++;
-        return $this->position;
     }
 }
